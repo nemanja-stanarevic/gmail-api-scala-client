@@ -1,0 +1,24 @@
+# SBT
+boot/
+lib_managed/
+src_managed/
+test-output/
+target/
+project/project/
+project/target/
+.history
+
+# Eclipse
+.cache
+.classpath
+.project
+.worksheet
+.scala_dependencies
+.settings
+.target/
+
+# Mac
+.DS_Store
+
+#Other
+scalastyle-config.xml
