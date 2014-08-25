@@ -1,8 +1,5 @@
 package gmailapi.resources
 
-import spray.httpx.Json4sJacksonSupport
-import org.json4s.{DefaultFormats, FieldSerializer}
-
 object MessageListVisibility extends Enumeration {
     val Hide = Value("hide")
     val Show = Value("show")
@@ -31,10 +28,3 @@ case class Label (
   ownerType: Option[LabelOwnerType.Value] = None
 ) extends GmailResource 
 
-object LabelSerializer extends Json4sJacksonSupport {
-  implicit def json4sJacksonFormats = DefaultFormats + 
-    FieldSerializer[Label]() +
-    new org.json4s.ext.EnumNameSerializer(LabelListVisibility) + 
-    new org.json4s.ext.EnumNameSerializer(LabelOwnerType) + 
-    new org.json4s.ext.EnumNameSerializer(MessageListVisibility) 
-}

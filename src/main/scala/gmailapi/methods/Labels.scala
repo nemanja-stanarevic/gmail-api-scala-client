@@ -2,14 +2,14 @@ package gmailapi.methods
 
 import akka.actor.Actor
 import gmailapi.oauth2.OAuth2Identity
-import gmailapi.resources.{ Label, LabelSerializer }
+import gmailapi.resources.{ Label, GmailSerializer }
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes }
 
 object Labels {
-  import LabelSerializer._
+  import GmailSerializer._
   
   case class Create(label: Label, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
