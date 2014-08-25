@@ -4,6 +4,8 @@ import akka.actor.Actor
 import gmailapi.oauth2.OAuth2Identity
 import gmailapi.resources.{ Label, LabelSerializer }
 import org.json4s.jackson.Serialization.{ read, write }
+import org.json4s.jackson.JsonMethods.parse
+import scala.collection.immutable.Map
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes }
 
 object Labels {
@@ -36,7 +38,7 @@ object Labels {
     val method = HttpMethods.GET
     val credentials : Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
-    val unmarshaller = Some(read[Seq[Label]](_:String))
+    val unmarshaller = Some((str:String) => (parse(str) \\ "labels").extract[Seq[Label]])
   }
   
   case class Update(id: String, label: Label, userId: String = "me") 
@@ -59,13 +61,14 @@ object Labels {
     val unmarshaller = Some(read[Label](_:String))
   }
   
-  case class Patch(id: String, label: Label, userId: String = "me") 
+  case class Patch(id: String, patch: Map[String, Any], userId: String = "me") 
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
 
+    /* TO DO: Validate that patch keys are in Label resource. */
     val uri = s"$baseUri/users/$userId/labels/$id" 
     val method = HttpMethods.PATCH
     val credentials : Option[HttpCredentials] = token
-    val entity = HttpEntity(ContentTypes.`application/json`, write(label))
+    val entity = HttpEntity(ContentTypes.`application/json`, write(patch))
     val unmarshaller = Some(read[Label](_:String))
   }
 }

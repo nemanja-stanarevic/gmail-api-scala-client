@@ -14,7 +14,7 @@ object RestActor {
   case class ErrorHandler(
     statusCode: StatusCode, 
     response: RestResponses.RestResponse)
-    (val filter: String => Boolean = _ => true)
+    (val filter: (String => Boolean) = (_:String) => true)
 }
 
 trait RestActor {
@@ -59,6 +59,7 @@ trait RestActor {
       val client = context.sender
       val unmarshaller = message.unmarshaller
       val startTimestamp = System.currentTimeMillis
+      
 	  pipeline(httpRequest) onComplete {
         case Success(response @ HttpResponse(StatusCodes.OK, _, _, _)) => 
           val doneTimestamp = System.currentTimeMillis
@@ -72,8 +73,15 @@ trait RestActor {
             case None =>
               client ! RestResponses.Done
           }
+        // Rest service may return 204 NoContent when there is no response
+        case Success(response @ HttpResponse(StatusCodes.NoContent, _, _, _)) => 
+          val doneTimestamp = System.currentTimeMillis
+          log.info("Lap time [{}] sec for [{}].", 
+              (doneTimestamp-startTimestamp)/1000.0, 
+              message.getClass())
+          client ! RestResponses.Done
         case Success(response @ HttpResponse(statusCode, entity, _, _)) => 
-          log.info("Rest service returned an error.  Request: [{}] Response: [{}]", 
+          log.debug("Rest service returned an error.  Request: [{}] Response: [{}]", 
               httpRequest,
               response)
               

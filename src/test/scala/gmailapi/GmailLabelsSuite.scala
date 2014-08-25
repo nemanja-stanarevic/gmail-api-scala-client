@@ -77,7 +77,8 @@ class GmailLabelsSuite(_system: ActorSystem)
     oauthId = result.get 
   }
 
-  var actualLabel = Label(name = "foo")
+  var actualLabel = Label(name = "foo") 
+  var actualLabelId = ""
   test("02-Gmail.Labels.Create") {
     val probe = TestProbe()
     val id = scala.util.Random.nextLong
@@ -90,27 +91,134 @@ class GmailLabelsSuite(_system: ActorSystem)
     actualLabel = result.get
     
     if (actualLabel.id == None)
-	  fail("Gmail.Label.Create should set the label id.")
+	  fail("Gmail.Labels.Create should set the label id.")
+	actualLabelId = actualLabel.id.get
 
 	if (actualLabel.name != label.name)
-	  fail("Gmail.Label.Create should set the label name.")
+	  fail("Gmail.Labels.Create should set the label name.")
 
 	if (actualLabel.messageListVisibility != label.messageListVisibility)
-	  fail("Gmail.Label.Create should set messageListVisibility.")
+	  fail("Gmail.Labels.Create should set messageListVisibility.")
 
 	  if (actualLabel.labelListVisibility != label.labelListVisibility)
-	  fail("Gmail.Label.Create should set labelListVisibility.")
+	  fail("Gmail.Labels.Create should set labelListVisibility.")
   }
 
-  test("02-Gmail.Labels.Get") {
+  test("03-Gmail.Labels.Get") {
     val probe = TestProbe()
     probe.send(gmailApi, Labels.Get(id = actualLabel.id.get))
     val result = probe.expectMsgType[Resource[Label]]
     val returnLabel = result.get
     
     if (actualLabel.id != returnLabel.id)
-	  fail("Gmail.Label.Get should return the requested label.")
+	  fail("Gmail.Labels.Get should return the requested label.")
+
+	// now try a label that does not exist
+    probe.send(gmailApi, Labels.Get(id = "Foo_Bar"))
+    probe.expectMsg(NotFound)
   }
 
+  test("04-Gmail.Labels.Update") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    val newName = "label-test-"+id
+
+    assert(newName != actualLabel.name)
+  
+    val newLabel = Label(
+	  id = actualLabel.id,
+	  name = newName,
+	  messageListVisibility = MessageListVisibility.Show,
+	  labelListVisibility = LabelListVisibility.LabelShow,
+	  ownerType = actualLabel.ownerType)
+	  
+    probe.send(gmailApi, Labels.Update(id = newLabel.id.get, label = newLabel))
+    val result = probe.expectMsgType[Resource[Label]]
+    val returnLabel = result.get
+    
+    if (newLabel.id != returnLabel.id)
+	  fail("Gmail.Labels.Update should preserve labelId.")
+
+	if (newName != returnLabel.name)
+	  fail("Gmail.Labels.Update should update label name.")
+	  
+	if (MessageListVisibility.Show != returnLabel.messageListVisibility)
+	  fail("Gmail.Labels.Update should update message list visibility.")
+
+	if (LabelListVisibility.LabelShow != returnLabel.labelListVisibility )
+	  fail("Gmail.Labels.Update should update label list visibility.")
+	  
+	actualLabel = returnLabel
+	
+	// now try a label that does not exist
+    probe.send(gmailApi, Labels.Update(id = "Foo_Bar", label = newLabel))
+    probe.expectMsg(NotFound)
+  }
+
+  test("05-Gmail.Labels.Patch") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    val newName = "label-test-"+id
+
+    assert(newName != actualLabel.name)
+  
+    val patch = Map("name" -> newName)
+	  
+    probe.send(gmailApi, Labels.Patch(id = actualLabel.id.get, patch = patch))
+    val result = probe.expectMsgType[Resource[Label]]
+    val returnLabel = result.get
+    
+    if (actualLabel.id != returnLabel.id)
+	  fail("Gmail.Labels.Patch should preserve labelId.")
+
+	if (newName != returnLabel.name)
+	  fail("Gmail.Labels.Patch should update label name.")
+	  
+	if (actualLabel.messageListVisibility != returnLabel.messageListVisibility)
+	  fail("Gmail.Labels.Patch should preserve messageListVisibility.")
+
+	if (actualLabel.labelListVisibility != returnLabel.labelListVisibility )
+	  fail("Gmail.Labels.Patch should preserve labelListVisibility.")
+	
+	actualLabel = returnLabel
+	
+	// now try a label that does not exist
+    probe.send(gmailApi, Labels.Patch(id = "Foo_Bar", patch = patch))
+    probe.expectMsg(NotFound)
+  }
+  
+  test("06-Gmail.Labels.List") {
+    val probe = TestProbe()
+    probe.send(gmailApi, Labels.List())
+    val result = probe.expectMsgType[Resource[Seq[Label]]]
+    val returnLabelSeq = result.get
+
+    if (returnLabelSeq filter (_.name == "INBOX") isEmpty)
+	  fail("Gmail.Labels.List should include INBOX.")
+    if (returnLabelSeq filter (_.name == "UNREAD") isEmpty)
+	  fail("Gmail.Labels.List should include UNREAD.")
+    if (returnLabelSeq filter (_.name == "SENT") isEmpty)
+	  fail("Gmail.Labels.List should include SENT.")
+    if (returnLabelSeq filter (_.name == actualLabel.name) isEmpty)
+	  fail(s"Gmail.Labels.List should include $actualLabel.name.")
+  }  
+ 
+  test("07-Gmail.Labels.Delete") {
+    val probe = TestProbe()
+    val id = actualLabel.id.get
+    probe.send(gmailApi, Labels.Delete(id = id))
+    probe.expectMsg(Done)
+
+    probe.send(gmailApi, Labels.List())
+    val result = probe.expectMsgType[Resource[Seq[Label]]]
+    val returnLabelSeq = result.get
+
+    if (! (returnLabelSeq filter (_.name == actualLabel.name) isEmpty) )
+	  fail(s"Gmail.Labels.Delete should remove $actualLabel.name.")
+
+	// now try a label that does not exist
+    probe.send(gmailApi, Labels.Delete(id = "Foo_Bar"))
+    probe.expectMsg(NotFound)
+  } 
 }
 

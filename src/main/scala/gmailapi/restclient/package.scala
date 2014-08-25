@@ -9,8 +9,8 @@ package object restclient {
   	case class  Resource[+A](get: A) extends RestResponse
     case object Done extends RestResponse
     case object ExpiredAuthToken extends RestResponse
-    case object InvalidCredentials extends RestResponse
-    case class  BadRequest(message: String) extends RestResponse
+    case object NotFound extends RestResponse
+    case class  InvalidRequest(message:String) extends RestResponse
     case class  Failure(statusCode: Int, message: String) extends RestResponse
     case class  Exception(throwable: Throwable) extends RestResponse
   }
