@@ -4,14 +4,14 @@
 
 [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
-## Motivation
+# Motivation
 Google published Gmail API libraries for Java, .NET and Python, with Go and Dart in the works. 
 However, there is currently no native Scala library and developing a wrapper around Google's Java library 
 is unattractive since the library is synchronous.
 
 This project aims to provide a fully-asynchronous actor-based pure Scala library for Gmail API.
 
-## High level project goals
+# High level project goals
 * Fully asynchronous
 * Actor-based 
 * Fast and lightweight
