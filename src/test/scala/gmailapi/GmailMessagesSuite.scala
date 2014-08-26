@@ -45,8 +45,9 @@ class GmailMessagesSuite(_system: ActorSystem)
          }
        }""").withFallback(ConfigFactory.load()) ))
   
-  override def afterAll = 
+  override def afterAll = {
     system.shutdown()
+  }
 
   val scope = Seq(
       "https://www.googleapis.com/auth/userinfo.email",
@@ -77,22 +78,45 @@ class GmailMessagesSuite(_system: ActorSystem)
     oauthId = result.get 
   }
 
-  var actualMessage = Message(threadId="Foo_Bar") 
+  var actualMessage = Message() 
   var actualMessageId = ""
-  
-  /* TO DO: These are toy tests, needs more work once the Messages framework is completed */
-  test("01-Gmail.Messages.List") {
+  var actualSubject = ""
+  var actualTo = ""
+    
+  test("02-Gmail.Messages.Insert") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    actualSubject = "Scala API Test "+id
+    actualTo = s"scala.api.test+$id@gmail.com"
+    val rawMsg = MessageFactory.createMessage(
+		  labelIds = Seq("INBOX"),
+		  fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
+		  to =  Seq(("Scala API Test", actualTo)),
+		  subject = Some(actualSubject),
+		  textMsg = Some(actualSubject),
+		  htmlMsg = Some(s"<html><body><i>$actualSubject</i></body></html>")
+		  ) 
+    probe.send(gmailApi, Messages.Insert(message = rawMsg))
+    val result = probe.expectMsgType[Resource[Message]]
+    actualMessage = result.get
+    actualMessageId = actualMessage.id.get
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+  }
+
+  test("03-Gmail.Messages.List") {
     val probe = TestProbe()
     probe.send(gmailApi, Messages.List())
     val result = probe.expectMsgType[Resource[MessageList]]
     val returnMessageList = result.get
-
-    // get the id of the last message
-    returnMessageList.messages foreach { message =>
-      actualMessageId = message.id.get
-    }
-  }  
-  test("02-Gmail.Messages.Get") {
+    
+    // confirm that inserted message is in the list
+    if (returnMessageList.messages filter (_.id == Some(actualMessageId)) isEmpty)
+	  fail(s"Gmail.Labels.List should include a message with id: $actualMessageId.")
+  } 
+  
+  test("04-Gmail.Messages.Get") {
     val probe = TestProbe()
     assert(actualMessageId != "")
     probe.send(gmailApi, Messages.Get(id = actualMessageId))
@@ -129,10 +153,13 @@ class GmailMessagesSuite(_system: ActorSystem)
 	// now try a message that does not exist
     probe.send(gmailApi, Messages.Get(id = "Foo_Bar"))
     probe.expectMsg(NotFound)
-  }
+ 
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
+ }
 
   
-  test("03-Gmail.Messages.Delete") {
+  test("05-Gmail.Messages.Delete") {
     val probe = TestProbe()
     assert(actualMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = actualMessageId))
@@ -145,9 +172,15 @@ class GmailMessagesSuite(_system: ActorSystem)
     if (! (returnMessageList.messages filter (_.id == actualMessageId) isEmpty) )
 	  fail(s"Gmail.Messages.Delete should remove $actualMessageId.")
 
-	// now try a label that does not exist
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+
+    // now try a label that does not exist
     probe.send(gmailApi, Messages.Delete(id = "Foo_Bar"))
-    probe.expectMsg(NotFound)
+    probe.expectMsg(NotFound) 
+    
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
   } 
 }
 

@@ -39,8 +39,22 @@ object Messages {
     val unmarshaller = Some(read[Message](_:String))
   }
   
-  /* TO DO: Insert () */
-  
+  case class Insert(message: Message, userId: String = "me") 
+    (implicit val token: OAuth2Identity) extends GmailRestRequest {
+    assert(message.id == None)
+    assert(message.snippet == None)
+    assert(message.historyId == None)
+    assert(message.payload == None)
+    assert(message.sizeEstimate == None)
+    assert(message.raw != None)
+
+    val uri = s"$baseUri/users/$userId/messages"
+    val method = HttpMethods.POST
+    val credentials : Option[HttpCredentials] = token
+    val entity : HttpEntity = HttpEntity(ContentTypes.`application/json`, write(message))
+    val unmarshaller = Some(read[Message](_:String))
+  }
+    
   case class List(
     includeSpamTrash: Boolean = false,
     labelIds: Seq[String] = Nil,

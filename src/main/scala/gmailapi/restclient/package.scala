@@ -13,6 +13,7 @@ package object restclient {
     case class  InvalidRequest(message:String) extends RestResponse
     case class  Failure(statusCode: Int, message: String) extends RestResponse
     case class  Exception(throwable: Throwable) extends RestResponse
+    case object RateLimitExceeded extends RestResponse
   }
   
   trait RestRequest {

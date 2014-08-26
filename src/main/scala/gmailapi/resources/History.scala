@@ -1,7 +1,7 @@
 package gmailapi.resources
 
 case class History (
-  id: Long,
+  id: String,
   messages: Seq[Message]
 ) extends GmailResource 
 

@@ -24,6 +24,7 @@ object GmailapiscalaclientBuild extends Build {
         val specs2Version = "2.4"
         val json4sVersion = "3.2.10"
         val mimepullVersion = "1.9.4"
+        val commonsEmailVersion = "1.3.3"
 	    Seq(
 	      "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
 	      "org.scalacheck" %% "scalacheck" % scalacheckVersion % "test",
@@ -32,6 +33,8 @@ object GmailapiscalaclientBuild extends Build {
 	      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
 	      "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
 
+	      "org.apache.commons" % "commons-email" % commonsEmailVersion, 
+	      
 	      "io.spray" %% "spray-can" % sprayVersion,
 	      "io.spray" %% "spray-client" % sprayVersion,
 	      "io.spray" %% "spray-util" % sprayVersion,

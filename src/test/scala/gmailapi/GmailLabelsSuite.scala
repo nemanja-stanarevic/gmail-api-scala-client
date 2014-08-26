@@ -45,8 +45,9 @@ class GmailLabelsSuite(_system: ActorSystem)
          }
        }""").withFallback(ConfigFactory.load()) ))
   
-  override def afterAll = 
+  override def afterAll = {
     system.shutdown()
+  }
 
   val scope = Seq(
       "https://www.googleapis.com/auth/userinfo.email",
@@ -102,6 +103,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 
 	  if (actualLabel.labelListVisibility != label.labelListVisibility)
 	  fail("Gmail.Labels.Create should set labelListVisibility.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   }
 
   test("03-Gmail.Labels.Get") {
@@ -116,6 +120,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 	// now try a label that does not exist
     probe.send(gmailApi, Labels.Get(id = "Foo_Bar"))
     probe.expectMsg(NotFound)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   }
 
   test("04-Gmail.Labels.Update") {
@@ -153,6 +160,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 	// now try a label that does not exist
     probe.send(gmailApi, Labels.Update(id = "Foo_Bar", label = newLabel))
     probe.expectMsg(NotFound)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   }
 
   test("05-Gmail.Labels.Patch") {
@@ -185,6 +195,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 	// now try a label that does not exist
     probe.send(gmailApi, Labels.Patch(id = "Foo_Bar", patch = patch))
     probe.expectMsg(NotFound)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   }
   
   test("06-Gmail.Labels.List") {
@@ -201,6 +214,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 	  fail("Gmail.Labels.List should include SENT.")
     if (returnLabelSeq filter (_.name == actualLabel.name) isEmpty)
 	  fail(s"Gmail.Labels.List should include $actualLabel.name.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   }  
  
   test("07-Gmail.Labels.Delete") {
@@ -219,6 +235,9 @@ class GmailLabelsSuite(_system: ActorSystem)
 	// now try a label that does not exist
     probe.send(gmailApi, Labels.Delete(id = "Foo_Bar"))
     probe.expectMsg(NotFound)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   } 
 }
 

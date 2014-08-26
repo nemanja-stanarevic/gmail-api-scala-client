@@ -45,8 +45,9 @@ class GmailThreadsSuite(_system: ActorSystem)
          }
        }""").withFallback(ConfigFactory.load()) ))
   
-  override def afterAll = 
+  override def afterAll = {
     system.shutdown()
+  }
 
   val scope = Seq(
       "https://www.googleapis.com/auth/userinfo.email",
@@ -75,6 +76,9 @@ class GmailThreadsSuite(_system: ActorSystem)
     probe.send(gmailApi, OAuth2.RefreshToken(oauthId))
     val result = probe.expectMsgType[Resource[OAuth2Identity]]
     oauthId = result.get 
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
 
   /*
@@ -88,7 +92,7 @@ class GmailThreadsSuite(_system: ActorSystem)
    * */
   var actualLabel = Label(name = "foo") 
   var actualLabelId = ""
-  test("02-Gmail.Labels.Create") {
+/*  test("02-Gmail.Labels.Create") {
     val probe = TestProbe()
     val id = scala.util.Random.nextLong
     val label = Label(
@@ -228,6 +232,6 @@ class GmailThreadsSuite(_system: ActorSystem)
 	// now try a label that does not exist
     probe.send(gmailApi, Labels.Delete(id = "Foo_Bar"))
     probe.expectMsg(NotFound)
-  } 
+  } */
 }
 

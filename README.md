@@ -29,20 +29,20 @@ Project is under heavy development and significant functionality remains to be i
 COMPLETED:
 * OAuth API
 * Labels API
+* Test suites for OAuth, Labels APIs
 * Messages API (only Get, List, Delete)
+* Test suite for Messages API (List, Get, Delete)
 * Threads API
 * History API
-* Test suites for OAuth, Labels APIs
 
 TO DOs:
-* Test suite for Messages API (List, Get)
+* Complete Messages API (Insert, Modify, Send, Trash, Untrash, Import)
 * Test suite for Threads API
 * Test suite for History API
-* Complete Messages API (Insert, Modify, Send, Trash, Untrash, Import)
-* Complete test suite for Message API (Delete, Insert, Modify, Send, Trash, Untrash, Import)
+* Complete test suite for Message API (Insert, Modify, Send, Trash, Untrash, Import)
 * Attachments API (Get)
 * Test suite for Attachments API
-* Drafts API
+* Drafts API (Create, Delete, Get, List, Update, Send)
 * Test suite for Drafts API
 * Scala Docs
 * Actor Routers and Supervisors

@@ -28,6 +28,15 @@ class GmailApiActor extends Actor with RestActor {
     // when we try to update/delete a non-existent resource, we will return NotFound 
     // for uniform error handling
     RestActor.ErrorHandler(StatusCodes.BadRequest, RestResponses.NotFound){
-    	_.contains("invalidArgument") }
+    	_.contains("Invalid update request") },
+    RestActor.ErrorHandler(StatusCodes.BadRequest, RestResponses.NotFound){
+    	_.contains("Invalid delete request") },
+    RestActor.ErrorHandler(StatusCodes.BadRequest, RestResponses.NotFound){
+    	_.contains("Invalid id value") },
+    // otherwise, pass the error along... 
+    RestActor.ErrorHandler(StatusCodes.BadRequest, RestResponses.InvalidRequest("Invalid label")){
+    	_.contains("Invalid label") },
+    RestActor.ErrorHandler(StatusCodes.TooManyRequests, RestResponses.RateLimitExceeded)()
+    	
     )
 }

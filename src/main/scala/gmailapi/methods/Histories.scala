@@ -13,7 +13,7 @@ object Histories {
   
 
   case class List(
-    startHistoryId: Long,
+    startHistoryId: String,
     labelIds: Seq[String] = Nil,
     maxResults: Option[Int] = None,
     pageToken: Option[String] = None,

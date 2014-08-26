@@ -43,8 +43,9 @@ class OAuthSuite(_system: ActorSystem)
          }
        }""").withFallback(ConfigFactory.load()) ))
   
-  override def afterAll = 
+  override def afterAll = {
     system.shutdown()
+  }
 
   val scope = Seq(
       "https://www.googleapis.com/auth/userinfo.email",
@@ -72,6 +73,9 @@ class OAuthSuite(_system: ActorSystem)
     val probe = TestProbe()
     probe.send(gmailApi, OAuth2.ValidateToken(oauthId))
     probe.expectMsg(ExpiredAuthToken)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
   
   test("02-OAuth2-FlagInvalidToken") {
@@ -85,6 +89,9 @@ class OAuthSuite(_system: ActorSystem)
     // or invalid, so we will pass along ExpiredAuthToken message to allow client to 
     // to attempt a refresh
     probe.expectMsg(ExpiredAuthToken)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
   
   test("03-OAuth2-RefreshToken") {
@@ -97,6 +104,9 @@ class OAuthSuite(_system: ActorSystem)
 	  fail("OAuth2.RefreshToken should issue a new non-expired token.")
 	if (oauthId.expiration <= (System.currentTimeMillis() / 1000 + 3590))
 	  fail("OAuth2.RefreshToken should issue a token that is good for ~1 hour.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
   
   test("04-OAuth2-ValidateValidToken") {
@@ -109,6 +119,9 @@ class OAuthSuite(_system: ActorSystem)
         oauthId.userId == None |
         oauthId.scope == Nil)
       fail("OAuth2.ValidateToken should set email, user_id and scope.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
   
   test("05-OAuth2-GetUserInfo") {
@@ -141,6 +154,9 @@ class OAuthSuite(_system: ActorSystem)
       fail("OAuth2.GetUserInfo should set locale.")
     if (oldAuthId.scope != oauthId.scope)
       fail("OAuth2.GetUserInfo should not change scope.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
   
   test("06-OAuth2-RefreshTokenLeavesInfoAlone") {
@@ -170,6 +186,9 @@ class OAuthSuite(_system: ActorSystem)
       fail("OAuth2.RefreshToken should not change scope.")
     if (oldAuthId.userId  != oauthId.userId)
       fail("OAuth2.RefreshToken should not change userId.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
 
   test("07-OAuth2-ValidateTokenLeavesInfoAlone") {
@@ -193,6 +212,9 @@ class OAuthSuite(_system: ActorSystem)
       fail("OAuth2.ValidateToken should not change name.")
     if (oldAuthId.picture  != oauthId.picture)
       fail("OAuth2.ValidateToken should not change picture.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(100)
   }
 }
 
