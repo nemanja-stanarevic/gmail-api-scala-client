@@ -114,6 +114,9 @@ class GmailMessagesSuite(_system: ActorSystem)
     // confirm that inserted message is in the list
     if (returnMessageList.messages filter (_.id == Some(actualMessageId)) isEmpty)
 	  fail(s"Gmail.Labels.List should include a message with id: $actualMessageId.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
   } 
   
   test("04-Gmail.Messages.Get") {
@@ -155,7 +158,7 @@ class GmailMessagesSuite(_system: ActorSystem)
     probe.expectMsg(NotFound)
  
     // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(100)
+    java.lang.Thread.sleep(250)
  }
 
   
