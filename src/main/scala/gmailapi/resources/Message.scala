@@ -18,6 +18,12 @@ case class Message (
   raw: Option[String] = None
 ) extends GmailResource 
 
+object MessageFormat extends Enumeration {
+  val Full = Value("full")
+  val Minimal = Value("minimal")
+  val Raw = Value("raw")
+}
+
 object MessageFactory {
 	def createMessage(
 	  threadId: Option[String] = None,

@@ -17,5 +17,7 @@ object GmailSerializer extends Json4sJacksonSupport {
     FieldSerializer[Thread]() +
     FieldSerializer[ThreadList]() + 
     FieldSerializer[History]() + 
-    FieldSerializer[HistoryList]()  
+    FieldSerializer[HistoryList]() +
+    FieldSerializer[Draft]() +
+    FieldSerializer[DraftList]()
 }

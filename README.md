@@ -30,23 +30,25 @@ COMPLETED:
 * OAuth API
 * Labels API
 * Test suites for OAuth, Labels APIs
-* Messages API (only Get, List, Delete)
-* Test suite for Messages API (List, Get, Delete)
+* Messages API
+* Test suite for Messages API (Insert, List, Get, Delete)
 * Threads API
 * History API
+* Attachments API
+* Drafts API (Create, Delete, Get, List, Update, Send)
 
 TO DOs:
-* Complete Messages API (Insert, Modify, Send, Trash, Untrash, Import)
+* Complete test suite for Message API (Modify, Send, Trash, Untrash, Import)
 * Test suite for Threads API
 * Test suite for History API
-* Complete test suite for Message API (Insert, Modify, Send, Trash, Untrash, Import)
-* Attachments API (Get)
 * Test suite for Attachments API
-* Drafts API (Create, Delete, Get, List, Update, Send)
 * Test suite for Drafts API
 * Scala Docs
-* Actor Routers and Supervisors
-* ListAll methods for messages, threads and history (e.g. returns all resources in chunks rather than returning nextPageToken)
+* Routers and Supervisors
+* Gmail per-user request throttling
+* New ListAll methods for messages, threads and history 
+  - Method returns all resources asynchronously in chunks of specified size rather than returning nextPageToken
+    with each response and having to make another request
 
 MAYBEs:
 * Support for Google's Discovery API using Scala reflection
