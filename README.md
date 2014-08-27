@@ -71,7 +71,7 @@ TO DO...
 
 You can add the gmail-api-scala-client as a dependency as follows:
 
-## SBT
+### SBT
 
 ```scala
     val gmailApiScalaClient = "com.github.nemanja-stanarevic" % "gmail-api-scala-client" % "0.1"
