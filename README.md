@@ -1,8 +1,4 @@
-# gmail-api-scala-client
-
-# Code Climate
-
-[![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
+# gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
 # Motivation
 Google published Gmail API libraries for Java, .NET and Python, with Go and Dart in the works. 
