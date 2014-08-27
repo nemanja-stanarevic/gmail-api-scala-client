@@ -35,7 +35,7 @@ object GmailapiscalaclientBuild extends Build {
           "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
 
           "org.apache.commons" % "commons-email" % commonsEmailVersion,
-          "org.apache.commons" % "commons-codec" % commonsCodecVersion,
+          "commons-codec" % "commons-codec" % commonsCodecVersion,
 
           "io.spray" %% "spray-can" % sprayVersion,
           "io.spray" %% "spray-client" % sprayVersion,
