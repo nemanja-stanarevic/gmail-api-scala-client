@@ -1,9 +1,7 @@
 package gmailapi.resources
 
-case class Thread (
+case class Thread(
   id: String,
   snippet: String,
   historyId: Long,
-  messages: Seq[Message]
-) extends GmailResource 
-
+  messages: Seq[Message]) extends GmailResource 

@@ -1,7 +1,5 @@
 package gmailapi.resources
 
-case class History (
+case class History(
   id: String,
-  messages: Seq[Message]
-) extends GmailResource 
-
+  messages: Seq[Message]) extends GmailResource 

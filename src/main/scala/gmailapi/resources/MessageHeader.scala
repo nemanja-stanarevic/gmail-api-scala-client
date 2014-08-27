@@ -1,7 +1,5 @@
 package gmailapi.resources
 
-case class MessageHeader (
+case class MessageHeader(
   name: String,
-  value: String
-) extends GmailResource 
-
+  value: String) extends GmailResource 
