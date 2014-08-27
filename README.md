@@ -1,13 +1,13 @@
 # gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
-# Motivation
+## Motivation
 Google published Gmail API libraries for Java, .NET and Python, with Go and Dart in the works. 
 However, there is currently no native Scala library and developing a wrapper around Google's Java library 
 is unattractive since the library is synchronous.
 
 This project aims to provide a fully-asynchronous actor-based pure Scala library for Gmail API.
 
-# High level project goals
+## High level project goals
 * Fully asynchronous
 * Actor-based 
 * Fast and lightweight
@@ -17,8 +17,7 @@ This project aims to provide a fully-asynchronous actor-based pure Scala library
 * Logging via Akka event bus
 * Type safety
 
-Project Status
-==============
+## Project Status
 
 Project is under heavy development and significant functionality remains to be implemented. 
 
@@ -49,8 +48,7 @@ TO DOs:
 MAYBEs:
 * Support for Google's Discovery API using Scala reflection
 
-Usage
-=====
+## Usage
 
 ```scala
 import akka.actor._
@@ -62,19 +60,18 @@ import gmailapi.restclient.RestResponses
 ```
 TO DO...
 
-Dependencies
-============
+## Dependencies
+
 * Akka (https://typesafe.com/platform/runtime/akka)
 * Spray (http://spray.io)
 * json4s (http://json4s.org)
 * scalatest / scalacheck / specs2
 
-Installation
-============
+## Installation
 
 You can add the gmail-api-scala-client as a dependency as follows:
 
-### SBT
+## SBT
 
 ```scala
     val gmailApiScalaClient = "com.github.nemanja-stanarevic" % "gmail-api-scala-client" % "0.1"
