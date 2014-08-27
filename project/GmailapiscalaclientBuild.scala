@@ -11,7 +11,7 @@ object GmailapiscalaclientBuild extends Build {
       organization := "io.gmailapi",
       version := "0.1-SNAPSHOT",
       scalaVersion := "2.11.2",
-        
+
       resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
       resolvers += "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases",
       resolvers += "Spray repository" at "http://repo.spray.io/",
@@ -25,30 +25,27 @@ object GmailapiscalaclientBuild extends Build {
         val json4sVersion = "3.2.10"
         val mimepullVersion = "1.9.4"
         val commonsEmailVersion = "1.3.3"
-	    Seq(
-	      "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
-	      "org.scalacheck" %% "scalacheck" % scalacheckVersion % "test",
-	      "org.specs2" %% "specs2" % specs2Version % "test",
-    
-	      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-	      "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
+        val commonsCodecVersion = "1.9"
+        Seq(
+          "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
+          "org.scalacheck" %% "scalacheck" % scalacheckVersion % "test",
+          "org.specs2" %% "specs2" % specs2Version % "test",
 
-	      "org.apache.commons" % "commons-email" % commonsEmailVersion, 
-	      
-	      "io.spray" %% "spray-can" % sprayVersion,
-	      "io.spray" %% "spray-client" % sprayVersion,
-	      "io.spray" %% "spray-util" % sprayVersion,
-	      "io.spray" %% "spray-http" % sprayVersion,
-	      "io.spray" %% "spray-httpx" % sprayVersion,
-	      "io.spray" %% "spray-testkit" % sprayVersion % "test",
+          "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+          "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
 
-	      "org.jvnet.mimepull" % "mimepull" % mimepullVersion,
-	      "org.json4s" %% "json4s-jackson" % json4sVersion,
-	      "org.json4s" %% "json4s-ext" % json4sVersion,
+          "org.apache.commons" % "commons-email" % commonsEmailVersion,
+          "org.apache.commons" % "commons-codec" % commonsCodecVersion,
 
-	      "commons-codec" % "commons-codec" % "1.9"
-	    )      
-      }
-    )
-  )
+          "io.spray" %% "spray-can" % sprayVersion,
+          "io.spray" %% "spray-client" % sprayVersion,
+          "io.spray" %% "spray-util" % sprayVersion,
+          "io.spray" %% "spray-http" % sprayVersion,
+          "io.spray" %% "spray-httpx" % sprayVersion,
+          "io.spray" %% "spray-testkit" % sprayVersion % "test",
+
+          "org.jvnet.mimepull" % "mimepull" % mimepullVersion,
+          "org.json4s" %% "json4s-jackson" % json4sVersion,
+          "org.json4s" %% "json4s-ext" % json4sVersion)
+      }))
 }
