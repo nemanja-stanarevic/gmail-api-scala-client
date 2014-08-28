@@ -176,6 +176,75 @@ class GmailMessagesSuite(_system: ActorSystem)
     java.lang.Thread.sleep(250)
   }
 
+  var actualLabel = Label(name = "foo")
+  var actualLabelId = ""
+
+  test("05-Gmail.Labels.Create") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    val label = Label(
+      name = "label-test-" + id,
+      messageListVisibility = MessageListVisibility.Hide,
+      labelListVisibility = LabelListVisibility.LabelShowIfUnread)
+    probe.send(gmailApi, Labels.Create(label))
+    val result = probe.expectMsgType[Resource[Label]]
+    actualLabel = result.get
+
+    if (actualLabel.id == None)
+      fail("Gmail.Labels.Create should set the label id.")
+    actualLabelId = actualLabel.id.get
+
+    if (actualLabel.name != label.name)
+      fail("Gmail.Labels.Create should set the label name.")
+
+    if (actualLabel.messageListVisibility != label.messageListVisibility)
+      fail("Gmail.Labels.Create should set messageListVisibility.")
+
+    if (actualLabel.labelListVisibility != label.labelListVisibility)
+      fail("Gmail.Labels.Create should set labelListVisibility.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  test("06-Gmail.Messages.Modify--AddLabel"){
+    val probe = TestProbe()
+    probe.send(gmailApi, Messages.Modify(
+        id = actualMessageId,
+        addLabelIds = Seq(actualLabelId)))
+    val result = probe.expectMsgType[Resource[Message]]
+    val resultingMessage = result.get
+
+    if (!resultingMessage.labelIds.contains(actualLabelId))
+      fail("Gmail.Messages.Modify should add a label to the message.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  test("07-Gmail.Messages.Modify--RemoveLabel"){
+    val probe = TestProbe()
+    probe.send(gmailApi, Messages.Modify(
+        id = actualMessageId,
+        removeLabelIds = Seq(actualLabelId)))
+    val result = probe.expectMsgType[Resource[Message]]
+    val resultingMessage = result.get
+
+    if (resultingMessage.labelIds contains actualLabelId)
+      fail("Gmail.Messages.Modify should remove a label from the message.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  test("07-Gmail.Labels.Delete") {
+    val probe = TestProbe()
+    probe.send(gmailApi, Labels.Delete(id = actualLabelId))
+    probe.expectMsg(Done)
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
   test("05-Gmail.Messages.Delete") {
     val probe = TestProbe()
     assert(actualMessageId != "")
