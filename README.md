@@ -1,11 +1,13 @@
 # gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
 ## Motivation
-Google published Gmail API libraries for Java, .NET and Python, with Go and Dart in the works. 
-However, there is currently no native Scala library and developing a wrapper around Google's Java library 
-is unattractive since the library is synchronous.
+Google published Gmail API libraries for Java, .NET and Python, with Go and Dart
+in the works. However, there is currently no native Scala library and developing
+a wrapper around Google's Java library is unattractive since the library is 
+synchronous.
 
-This project aims to provide a fully-asynchronous actor-based pure Scala library for Gmail API.
+This project aims to provide a fully-asynchronous actor-based pure Scala library
+for Gmail API.
 
 ## High level project goals
 * Fully asynchronous
@@ -19,7 +21,8 @@ This project aims to provide a fully-asynchronous actor-based pure Scala library
 
 ## Project Status
 
-Project is under heavy development and significant functionality remains to be implemented. 
+Project is under heavy development. Test suite remains to be completed as well
+as code documentation.
 
 COMPLETED:
 * OAuth API
@@ -39,14 +42,20 @@ TO DOs:
 * Test suite for Attachments API
 * Test suite for Drafts API
 * Scala Docs
-* Routers and Supervisors
-* Gmail per-user request throttling
+* Sample router and supervisor (including implementation of RetryPolicy)
 * New ListAll methods for messages, threads and history 
-  - Method returns all resources asynchronously in chunks of specified size rather than returning nextPageToken
-    with each response and having to make another request
+  - Method returns all resources asynchronously in chunks of specified size
+    rather than returning nextPageToken with each response and having to make
+    another request
 
-MAYBEs:
+Future[MAYBEs]:
 * Support for Google's Discovery API using Scala reflection
+
+Users should implement routers and supervisors appropriate for the specific
+use cases. It will be important to consider Gmail API per user request
+limitations (currently set at 25 work units per user/per second) and implement
+exponential backoff and potentially per-user request throttling. The library
+provides scaffolding for retry policy implementation (see gmailapi.restclient.RetryPolicy).
 
 ## Usage
 
@@ -58,7 +67,8 @@ import gmailapi.resources._
 import gmailapi.restclient.RestResponses
 ...
 ```
-TO DO...
+
+TO DO
 
 ## Dependencies
 
@@ -66,6 +76,10 @@ TO DO...
 * Spray (http://spray.io)
 * json4s (http://json4s.org)
 * scalatest / scalacheck / specs2
+
+## How it works
+
+TO DO
 
 ## Installation
 
