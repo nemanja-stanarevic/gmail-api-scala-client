@@ -1,5 +1,7 @@
 # gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
+Made with <span style="color:#61AE24">❤</span> in NYC at Hacker School <http://hackerschool.com>
+
 ## Motivation
 Google published Gmail API libraries for Java, .NET and Python, with Go and Dart
 in the works. However, there is currently no native Scala library and developing
