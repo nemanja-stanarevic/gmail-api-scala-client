@@ -24,6 +24,8 @@ for Gmail API.
 Project is under heavy development. Test suite remains to be completed as well
 as code documentation.
 
+Pull requests, code reviews, comments and questions are all appreciated.
+
 COMPLETED:
 * OAuth API
 * Labels API
