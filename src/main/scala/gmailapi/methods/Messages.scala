@@ -162,6 +162,7 @@ object Messages {
   case class Import(message: Message, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
     assert(message.id == None)
+    assert(message.labelIds == Nil)
     assert(message.snippet == None)
     assert(message.historyId == None)
     assert(message.payload == None)

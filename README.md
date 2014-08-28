@@ -35,20 +35,19 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * Attachments API
 * Drafts API
 * Test suites for OAuth and Labels APIs
-* Test suite for Messages API (Insert, List, Get, Delete)
+* Test suite for Messages API
+* Test suite for Threads API
 
 ####TO DOs:
-* Complete test suite for Message API (Modify, Send, Trash, Untrash, Import)
-* Test suite for Threads API
 * Test suite for History API
-* Test suite for Attachments API
 * Test suite for Drafts API
+* Test suite for Attachments API
 * Scala Docs
 * Sample router and supervisor (including implementation of RetryPolicy)
-* New ListAll methods for messages, threads and history 
-  - Method returns all resources asynchronously in chunks of specified size
-    rather than returning nextPageToken with each response and having to make
-    another request
+* Define ListAll actor message for Gmail Messages, Threads and History
+  - Actor sends all resources asynchronously in chunks of specified size
+    rather than returning nextPageToken with each response and requiring the 
+    client to make subsequent request
 
 ####Future[Maybes]:
 * Support for Google's Discovery API using Scala reflection

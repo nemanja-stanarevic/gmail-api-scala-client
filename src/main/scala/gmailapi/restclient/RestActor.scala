@@ -96,7 +96,7 @@ trait RestActor {
             message.getClass())
           client ! RestResponses.Done
         case Success(response @ HttpResponse(statusCode, entity, _, _)) =>
-          log.debug("Rest service returned an error.  Request: [{}] Response: [{}]",
+          log.info("Rest service returned an error.  Request: [{}] Response: [{}]",
             httpRequest,
             response)
 

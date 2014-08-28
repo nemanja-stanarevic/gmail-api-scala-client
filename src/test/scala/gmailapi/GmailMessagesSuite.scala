@@ -237,7 +237,7 @@ class GmailMessagesSuite(_system: ActorSystem)
     java.lang.Thread.sleep(250)
   }
 
-  test("07-Gmail.Labels.Delete") {
+  test("08-Gmail.Labels.Delete") {
     val probe = TestProbe()
     probe.send(gmailApi, Labels.Delete(id = actualLabelId))
     probe.expectMsg(Done)
@@ -245,10 +245,136 @@ class GmailMessagesSuite(_system: ActorSystem)
     java.lang.Thread.sleep(250)
   }
 
-  test("05-Gmail.Messages.Delete") {
+  test("09-Gmail.Messages.Trash"){
+    val probe = TestProbe()
+    probe.send(gmailApi, Messages.Trash(id = actualMessageId))
+    val result = probe.expectMsgType[Resource[Message]]
+    val resultingMessage = result.get
+
+    if (!resultingMessage.labelIds.contains("TRASH"))
+      fail("Gmail.Messages.Trash should apply TRASH label.")
+
+    if (resultingMessage.labelIds.contains("INBOX"))
+      fail("Gmail.Messages.Trash should remove INBOX label.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  test("10-Gmail.Messages.Untrash"){
+    val probe = TestProbe()
+    probe.send(gmailApi, Messages.Untrash(id = actualMessageId))
+    val result = probe.expectMsgType[Resource[Message]]
+    val resultingMessage = result.get
+
+    if (resultingMessage.labelIds.contains("TRASH"))
+      fail("Gmail.Messages.Untrash should remove TRASH label.")
+
+    // Gmail will actually not re-apply INBOX label but rather SENT (this is
+    // a Gmail bug
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  var secondMessage = Message()
+  var secondMessageId = ""
+  var secondSubject = ""
+  var secondTo = ""
+  test("11-Gmail.Messages.Import") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    secondSubject = "Scala API Test " + id
+    secondTo = s"scala.api.test+$id@gmail.com"
+    val rawMsg = MessageFactory.createMessage(
+      fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
+      to = Seq(("Scala API Test", secondTo)),
+      subject = Some(secondSubject),
+      textMsg = Some(secondSubject),
+      htmlMsg = Some(s"<html><body><i>$secondSubject</i></body></html>"))
+    probe.send(gmailApi, Messages.Import(message = rawMsg))
+    val result = probe.expectMsgType[Resource[Message]]
+    secondMessage = result.get
+    secondMessageId = secondMessage.id.get
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+  }
+
+  test("12-Gmail.Messages.Get--ImportedMessage") {
+    val probe = TestProbe()
+    assert(secondMessageId != "")
+    probe.send(gmailApi, Messages.Get(id = secondMessageId))
+    val result = probe.expectMsgType[Resource[Message]]
+    val returnMessage = result.get
+
+    if (secondMessageId != returnMessage.id.get)
+      fail("Gmail.Messages.Get should return the requested message.")
+
+    if (returnMessage.id == None)
+      fail("Gmail.Messages.Get should include historyId.")
+
+    if (returnMessage.threadId == "")
+      fail("Gmail.Messages.Get should include threadId.")
+
+    if (returnMessage.labelIds.length == 0)
+      fail("Gmail.Messages.Get should include some labelIds.")
+
+    if (returnMessage.snippet == None)
+      fail("Gmail.Messages.Get should include snippet.")
+
+    if (returnMessage.historyId == None)
+      fail("Gmail.Messages.Get should include historyId.")
+
+    if (returnMessage.payload == None)
+      fail("Gmail.Messages.Get should include payload.")
+
+    if (returnMessage.sizeEstimate == None)
+      fail("Gmail.Messages.Get should include sizeEstimate.")
+
+    if (returnMessage.raw != None)
+      fail("Gmail.Messages.Get should not include raw (this was full request).")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+  }
+
+  var thirdMessageId = ""
+  test("13-Gmail.Messages.Send") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    val thirdSubject = "Scala API Test " + id
+    val thirdTo = s"scala.api.test+$id@gmail.com"
+    val rawMsg = MessageFactory.createMessage(
+      fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
+      to = Seq(("Scala API Test", thirdTo)),
+      subject = Some(thirdSubject),
+      textMsg = Some(thirdSubject),
+      htmlMsg = Some(s"<html><body><i>$thirdSubject</i></body></html>"))
+    probe.send(gmailApi, Messages.Send(message = rawMsg))
+    val result = probe.expectMsgType[Resource[Message]]
+    val thridMessage = result.get
+    thirdMessageId = thridMessage.id.get
+
+    if (!thridMessage.labelIds.contains("SENT"))
+      fail("Gmail.Messages.Sent should apply SENT label.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+  }
+
+  test("14-Gmail.Messages.Delete") {
     val probe = TestProbe()
     assert(actualMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = actualMessageId))
+    probe.expectMsg(Done)
+
+    assert(secondMessageId != "")
+    probe.send(gmailApi, Messages.Delete(id = secondMessageId))
+    probe.expectMsg(Done)
+
+    assert(thirdMessageId != "")
+    probe.send(gmailApi, Messages.Delete(id = thirdMessageId))
     probe.expectMsg(Done)
 
     probe.send(gmailApi, Messages.List())
@@ -257,6 +383,12 @@ class GmailMessagesSuite(_system: ActorSystem)
 
     if (!(returnMessageList.messages filter (_.id == actualMessageId) isEmpty))
       fail(s"Gmail.Messages.Delete should remove $actualMessageId.")
+
+    if (!(returnMessageList.messages filter (_.id == secondMessageId) isEmpty))
+      fail(s"Gmail.Messages.Delete should remove $secondMessageId.")
+
+    if (!(returnMessageList.messages filter (_.id == thirdMessageId) isEmpty))
+      fail(s"Gmail.Messages.Delete should remove $thirdMessageId.")
 
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(1000)
