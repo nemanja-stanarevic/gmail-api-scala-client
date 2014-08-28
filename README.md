@@ -9,7 +9,7 @@ since the library is synchronous.
 This project aims to provide a fully-asynchronous actor-based pure Scala library
 for Gmail API.
 
-## High level project goals
+## High-Level Project Goals
 * Fully asynchronous
 * Actor-based 
 * Fast and lightweight
@@ -26,18 +26,18 @@ as code documentation.
 
 Pull requests, code reviews, comments and questions are all appreciated.
 
-COMPLETED:
+####Completed:
 * OAuth API
 * Labels API
-* Test suites for OAuth, Labels APIs
 * Messages API
-* Test suite for Messages API (Insert, List, Get, Delete)
 * Threads API
 * History API
 * Attachments API
-* Drafts API (Create, Delete, Get, List, Update, Send)
+* Drafts API
+* Test suites for OAuth and Labels APIs
+* Test suite for Messages API (Insert, List, Get, Delete)
 
-TO DOs:
+####TO DOs:
 * Complete test suite for Message API (Modify, Send, Trash, Untrash, Import)
 * Test suite for Threads API
 * Test suite for History API
@@ -50,7 +50,7 @@ TO DOs:
     rather than returning nextPageToken with each response and having to make
     another request
 
-Future[MAYBEs]:
+####Future[Maybes]:
 * Support for Google's Discovery API using Scala reflection
 
 Users should implement routers and supervisors appropriate for the specific
