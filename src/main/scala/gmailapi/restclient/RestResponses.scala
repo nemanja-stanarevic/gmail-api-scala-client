@@ -21,50 +21,47 @@ import spray.http.{ HttpMethod, HttpCredentials, HttpEntity }
 
 object RestResponses {
   sealed trait RestResponse {
-    def isFailure: Boolean
-    def retryPolicy: Option[RetryPolicy]
+    val isFailure: Boolean
+    val retryPolicy: Option[RetryPolicy]
   }
 
   case class Resource[+A](get: A) extends RestResponse {
-    def isFailure: Boolean = false
-    def retryPolicy: Option[RetryPolicy] = None
+    val isFailure = false
+    val retryPolicy = RetryPolicy.None
   }
 
   case object NotFound extends RestResponse {
-    def isFailure: Boolean = false
-    def retryPolicy: Option[RetryPolicy] = None
+    val isFailure = false
+    val retryPolicy = RetryPolicy.None
   }
 
   case object Done extends RestResponse {
-    def isFailure: Boolean = false
-    def retryPolicy: Option[RetryPolicy] = None
+    val isFailure = false
+    val retryPolicy = RetryPolicy.None
   }
 
   case object ExpiredAuthToken extends RestResponse {
-    def isFailure: Boolean = true
-    def retryPolicy: Option[RetryPolicy] =
-      Some(RetryPolicy(1, RetryPolicy.immediate))
+    val isFailure = true
+    val retryPolicy = RetryPolicy.OnceImmediate
   }
 
   case object RateLimitExceeded extends RestResponse {
-    def isFailure: Boolean = false
-    def retryPolicy: Option[RetryPolicy] =
-      Some(RetryPolicy(5, RetryPolicy.exponentialBackoff))
+    val isFailure = false
+    val retryPolicy: Option[RetryPolicy] = RetryPolicy.ExponentialBackoff
   }
 
   case class InvalidRequest(message: String) extends RestResponse {
-    def isFailure: Boolean = true
-    def retryPolicy: Option[RetryPolicy] = None
+    val isFailure = true
+    val retryPolicy = RetryPolicy.None
   }
 
   case class Failure(statusCode: Int, message: String) extends RestResponse {
-    def isFailure: Boolean = true
-    def retryPolicy: Option[RetryPolicy] =
-      Some(RetryPolicy(3, RetryPolicy.exponentialBackoff))
+    val isFailure = true
+    val retryPolicy: Option[RetryPolicy] = RetryPolicy.ExponentialBackoff
   }
 
   case class Exception(throwable: Throwable) extends RestResponse {
-    def isFailure: Boolean = true
-    def retryPolicy: Option[RetryPolicy] = None
+    val isFailure = true
+    val retryPolicy = RetryPolicy.None
   }
 }

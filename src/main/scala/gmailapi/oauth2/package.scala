@@ -23,7 +23,7 @@ import spray.http.Uri
 package object oauth2 {
 
   def authorizationUri(loginHint: Option[String] = None)
-    (implicit config: Config) : String =
+    (implicit config: Config): String =
     Uri("https://accounts.google.com/o/oauth2/auth") withQuery (
       "response_type" -> "code",
       "client_id" -> config.getString("oauth2.clientId"),
@@ -36,5 +36,4 @@ package object oauth2 {
         case Some(x) => x
         case None    => ""
       })) toString
-
 }

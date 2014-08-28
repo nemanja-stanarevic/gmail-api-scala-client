@@ -28,4 +28,10 @@ object RetryPolicy {
     1000 * Math.pow(2, retryNumber - 1).toInt + nextInt(1000)
 
   def immediate(retryNumber: Int): Int = 0
+
+  val None: Option[RetryPolicy] = scala.None
+  val OnceImmediate = Some(RetryPolicy(1, immediate))
+  val TwiceImmediate = Some(RetryPolicy(2, immediate))
+  val ThreeTimesImmediate = Some(RetryPolicy(3, immediate))
+  val ExponentialBackoff = Some(RetryPolicy(5, exponentialBackoff))
 }
