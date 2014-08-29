@@ -46,7 +46,8 @@ object Messages {
     userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
 
-    val uri = s"$baseUri/users/$userId/messages/$id"
+    val uri = Uri(s"$baseUri/users/$userId/messages/$id") withQuery (
+      Map("format" -> format.toString)) toString
     val method = HttpMethods.GET
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
