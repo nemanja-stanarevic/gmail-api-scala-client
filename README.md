@@ -37,9 +37,9 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * Test suites for OAuth and Labels APIs
 * Test suite for Messages API
 * Test suite for Threads API
+* Test suite for History API
 
 ####TO DOs:
-* Test suite for History API
 * Test suite for Drafts API
 * Test suite for Attachments API
 * Scala Docs
