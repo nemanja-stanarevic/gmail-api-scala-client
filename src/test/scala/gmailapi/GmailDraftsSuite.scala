@@ -190,6 +190,9 @@ class GmailDraftsSuite(_system: ActorSystem)
     // don't care about the result here, b/c it's incomplete message
     probe.expectMsgType[Resource[Draft]]
 
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+
     probe.send(gmailApi, Drafts.Get(id = actualDraftId))
     val result = probe.expectMsgType[Resource[Draft]]
     actualDraft = result.get
@@ -200,7 +203,7 @@ class GmailDraftsSuite(_system: ActorSystem)
       fail("Gmail.Drafts.Update should update the message.")
 
     // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(1000)
+    java.lang.Thread.sleep(250)
   }
 
   var actualMessageId = ""

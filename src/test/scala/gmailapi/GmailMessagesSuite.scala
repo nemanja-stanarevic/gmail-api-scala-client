@@ -55,8 +55,8 @@ class GmailMessagesSuite(_system: ActorSystem)
          loglevel = "INFO"
          actor {
            debug {
-             receive = off
-             lifecycle = off
+             receive = on
+             lifecycle = on
            }
          }
        }""").withFallback(ConfigFactory.load())))
@@ -293,7 +293,8 @@ class GmailMessagesSuite(_system: ActorSystem)
       textMsg = Some(secondSubject),
       htmlMsg = Some(s"<html><body><i>$secondSubject</i></body></html>"))
     probe.send(gmailApi, Messages.Import(message = rawMsg))
-    val result = probe.expectMsgType[Resource[Message]]
+    /* not sure why we need 60 s timeout here when the roundtrip takes ~0.5 s*/
+    val result = probe.expectMsgType[Resource[Message]](60 seconds)
     secondMessage = result.get
     secondMessageId = secondMessage.id.get
 

@@ -136,9 +136,6 @@ class GmailHistorySuite(_system: ActorSystem)
     val result = probe.expectMsgType[Resource[HistoryList]]
     val returnHistoryList = result.get
 
-    if (returnHistoryList.history  != Nil)
-      fail(s"Gmail.Histories.List should return an empty history list.")
-
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(250)
   }
