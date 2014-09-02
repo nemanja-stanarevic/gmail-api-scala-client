@@ -38,19 +38,22 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * Test suite for Messages API
 * Test suite for Threads API
 * Test suite for History API
+* Test suite for Drafts API
 
 ####TO DOs:
-* Test suite for Drafts API
 * Test suite for Attachments API
 * Scala Docs
+* Performance comparison between synchronous Java vs. async Scala full mailbox sync
 * Sample router and supervisor (including implementation of RetryPolicy)
+
+####Future[TO DOs]:
+* Support Google's Discovery API using Scala reflection
+* Implementation using Akka-Http instead of Spray
 * Define ListAll actor message for Gmail Messages, Threads and History
   - Actor sends all resources asynchronously in chunks of specified size
     rather than returning nextPageToken with each response and requiring the 
-    client to make subsequent request
-
-####Future[Maybes]:
-* Support for Google's Discovery API using Scala reflection
+    client to make subsequent request. This pattern may be useful if consumer
+    is faster than Gmail API.
 
 Users should implement routers and supervisors appropriate for the specific
 use cases. It will be important to consider Gmail API per user request

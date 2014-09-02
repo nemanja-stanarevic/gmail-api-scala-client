@@ -210,6 +210,5 @@ class GmailHistorySuite(_system: ActorSystem)
       java.lang.Thread.sleep(500)
     }
   }
-
 }
 

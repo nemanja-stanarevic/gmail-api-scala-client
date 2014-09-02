@@ -33,6 +33,7 @@ object Drafts {
     extends GmailRestRequest {
     assert(draft.message != None)
     assert(draft.message.get.id == None)
+    assert(draft.message.get.labelIds == Nil)
     assert(draft.message.get.snippet == None)
     assert(draft.message.get.historyId == None)
     assert(draft.message.get.payload == None)
@@ -86,6 +87,7 @@ object Drafts {
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
     assert(draft.message != None)
     assert(draft.message.get.id == None)
+    assert(draft.message.get.labelIds == Nil)
     assert(draft.message.get.snippet == None)
     assert(draft.message.get.historyId == None)
     assert(draft.message.get.payload == None)
@@ -121,6 +123,6 @@ object Drafts {
     val method = HttpMethods.POST
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity(ContentTypes.`application/json`, write(draft))
-    val unmarshaller = Some(read[Draft](_: String))
+    val unmarshaller = Some(read[Message](_: String))
   }
 }
