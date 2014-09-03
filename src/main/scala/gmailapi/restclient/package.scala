@@ -33,6 +33,9 @@ package gmailapi
   * [[gmailapi.restclient.RestRequest]] trait specifying concrete values for 
   * abstract members:
   * {{{
+  * import org.json4s.jackson.Serialization.{ read, write }
+  * import spray.http.{HttpCredentials, HttpEntity, HttpMethods, ContentTypes}
+  *
   * object People {
   *   import PersonSerializer._
   *

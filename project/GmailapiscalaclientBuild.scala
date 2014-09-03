@@ -8,13 +8,13 @@ object GmailapiscalaclientBuild extends Build {
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
       name := "gmail-api-scala-client",
-      organization := "io.gmailapi",
-      version := "0.1-SNAPSHOT",
+      organization := "gmailapi",
+      version := "0.1.0-SNAPSHOT",
       scalaVersion := "2.11.2",
 
       resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
       resolvers += "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases",
-      resolvers += "Spray repository" at "http://repo.spray.io/",
+      resolvers += "Spray Repository" at "http://repo.spray.io/",
 
       libraryDependencies ++= {
         val akkaVersion = "2.3.4"

@@ -1,17 +1,17 @@
 # gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
 ## Motivation
+This project aims to provide an asynchronous, actor-based, pure Scala library
+for Gmail API.
+
 Google published Gmail API client libraries for Java, .NET and Python, with Go
 and Dart libraries in the works. However, there is currently no native Scala
 library and developing a wrapper around Google's Java library is unattractive
 since the library is synchronous.
 
-This project aims to provide a fully-asynchronous actor-based pure Scala library
-for Gmail API.
-
 ## High-Level Project Goals
 * Fully asynchronous
-* Actor-based 
+* Actor-based
 * Fast and lightweight
 * Data model based on case classes and Scala collections
 * Easily extensible to support additional Google and non-Google APIs
@@ -35,10 +35,10 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * Performance comparison between synchronous Java vs. async Scala clients
 
 ####Future[TO DOs]:
+* Full inbox sync example code
+* Google Discovery API + Scala reflection to create methods and resources on the fly
 * Akka-Http
-* Use Google Discovery API and Scala reflection to create methods and resources
 * Hide away nextPageToken from List methods for Threads, Messages and History
-* Full inbox sync
 
 Gmail API limits per user usage to 25 work units per second (moving average). For
 more details, see <https://developers.google.com/gmail/api/v1/reference/quota>
@@ -92,6 +92,9 @@ Next, define REST service methods as implementations of
 abstract members `uri`, `method`, `credentials`, `entity`, and `unmarshaller`:
 
 ```scala
+import org.json4s.jackson.Serialization.{ read, write }
+import spray.http.{HttpCredentials, HttpEntity, HttpMethods, ContentTypes}
+
 object People {
   import PersonSerializer._
 
@@ -142,7 +145,7 @@ class PeopleApiActor extends Actor with RestActor {
 
 Access the APIs as follows:
 
-```
+```scala
 val myApi = system.actorOf(Props(new PeopleApiActor))
 implicit val creds = OAuth2BearerToken("...")
 
@@ -168,7 +171,17 @@ You can add the gmail-api-scala-client as a dependency as follows:
 ### SBT
 
 ```scala
-    val gmailApiScalaClient = "com.github.nemanja-stanarevic" % "gmail-api-scala-client" % "0.1"
+    // add Sonatype Snapshots to your resolvers
+    resolvers += "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+
+    // add library dependencies
+    libraryDependencies ++= {
+        val akkaVersion = "2.3.4"
+        val gmailApiScalaClientVersion = "0.1.0-SNAPSHOT"
+        Seq(
+          "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+          "com.github.nemanja-stanarevic" % "gmail-api-scala-client" % gmailApiScalaClientVersion)
+      }
 ```
 
 Made with ❤ in NYC at Hacker School <http://hackerschool.com>
