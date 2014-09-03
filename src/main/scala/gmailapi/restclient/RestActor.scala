@@ -39,8 +39,6 @@ trait RestActor {
   import context.dispatcher
   import RestActor._
 
-  type RestResource
-
   protected val errorHandler: Seq[ErrorHandler]
   protected val log: LoggingAdapter
 

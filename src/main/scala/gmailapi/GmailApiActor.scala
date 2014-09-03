@@ -29,7 +29,6 @@ import gmailapi.restclient._
 import gmailapi.resources.GmailResource
 
 class GmailApiActor extends Actor with RestActor {
-  type RestResource = GmailResource
   val log = Logging(context.system, this)
   val errorHandler = List(
     // Depending on the uri, google will return 400 or 401 when token is either
