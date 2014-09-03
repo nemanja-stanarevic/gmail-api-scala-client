@@ -51,7 +51,8 @@ object MessageFactory {
     bcc: Seq[(String, String)] = Nil,
     subject: Option[String] = None,
     textMsg: Option[String] = None,
-    htmlMsg: Option[String] = None): Message = {
+    htmlMsg: Option[String] = None,
+    attachments: Seq[(String, String)] = Nil): Message = {
 
     var _message = new HtmlEmail()
     _message.setHostName("smtp.gmail.com")
@@ -63,7 +64,10 @@ object MessageFactory {
     subject foreach { _message.setSubject(_) }
     textMsg foreach { msg => _message = _message.setTextMsg(msg) }
     htmlMsg foreach { msg => _message = _message.setHtmlMsg(msg) }
-
+    attachments foreach {
+      case (url, name) =>
+        _message.attach(new java.net.URL(url), name, "")
+    }
     _message.buildMimeMessage()
     val mimeMessage = _message.getMimeMessage()
 

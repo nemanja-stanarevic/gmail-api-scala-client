@@ -55,8 +55,8 @@ class GmailMessagesSuite(_system: ActorSystem)
          loglevel = "INFO"
          actor {
            debug {
-             receive = on
-             lifecycle = on
+             receive = off
+             lifecycle = off
            }
          }
        }""").withFallback(ConfigFactory.load())))
@@ -364,19 +364,78 @@ class GmailMessagesSuite(_system: ActorSystem)
     java.lang.Thread.sleep(1000)
   }
 
-  test("14-Gmail.Messages.Delete") {
+  var fourthMessageId = ""
+  test("13-Gmail.Messages.Attachments - Insert and Get") {
+    val probe = TestProbe()
+    val id = scala.util.Random.nextLong
+    val fourthSubject = "Scala API Test " + id
+    val fourthTo = s"scala.api.test+$id@gmail.com"
+    val rawMsg = MessageFactory.createMessage(
+      fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
+      to = Seq(("Scala API Test", fourthTo)),
+      subject = Some(fourthSubject),
+      textMsg = Some(fourthSubject),
+      htmlMsg = Some(s"<html><body><i>$fourthSubject</i></body></html>"),
+      attachments = Seq(("http://upload.wikimedia.org/wikipedia/en/0/0a/Gmail_logo.png", "Gmail Logo"),
+          ("http://www.gravity.com/wp-content/uploads/2013/07/635x282xscala.gif.pagespeed.ic.uwF00NWKP7.png", "Scala Logo")))
+    probe.send(gmailApi, Messages.Send(message = rawMsg))
+    val result = probe.expectMsgType[Resource[Message]]
+    fourthMessageId = result.get.id.get
+
+    probe.send(gmailApi, Messages.Get(id = fourthMessageId))
+    val fullResult = probe.expectMsgType[Resource[Message]]
+    val fourthMessage = fullResult.get
+
+    if (!fourthMessage.labelIds.contains("SENT"))
+      fail("Gmail.Messages.Sent should apply SENT label.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(1000)
+
+    for {
+      p <- fourthMessage.payload
+      pt <- p.parts
+      att <- pt.body
+      attachmentId <- att.attachmentId
+    } {
+      probe.send(gmailApi, Messages.Attachments.Get(
+        id = attachmentId,
+        messageId = fourthMessageId))
+      val result = probe.expectMsgType[Resource[MessageAttachment]]
+      val attachment = result.get
+      if (attachment.data == None)
+        fail(s"Gmail.Messages.Attachments.Get should return data for attachmentId $attachmentId")
+
+      // this is to throttle the request rate on Google API
+      java.lang.Thread.sleep(250)
+    }
+ }
+
+ test("14-Gmail.Messages.Delete") {
     val probe = TestProbe()
     assert(actualMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = actualMessageId))
     probe.expectMsg(Done)
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(500)
 
     assert(secondMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = secondMessageId))
     probe.expectMsg(Done)
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(500)
 
     assert(thirdMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = thirdMessageId))
     probe.expectMsg(Done)
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(500)
+
+    assert(fourthMessageId != "")
+    probe.send(gmailApi, Messages.Delete(id = fourthMessageId))
+    probe.expectMsg(Done)
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(500)
 
     probe.send(gmailApi, Messages.List())
     val result = probe.expectMsgType[Resource[MessageList]]
@@ -392,14 +451,14 @@ class GmailMessagesSuite(_system: ActorSystem)
       fail(s"Gmail.Messages.Delete should remove $thirdMessageId.")
 
     // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(1000)
+    java.lang.Thread.sleep(250)
 
     // now try a label that does not exist
     probe.send(gmailApi, Messages.Delete(id = "Foo_Bar"))
     probe.expectMsg(NotFound)
 
     // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(1000)
+    java.lang.Thread.sleep(500)
   }
 }
 
