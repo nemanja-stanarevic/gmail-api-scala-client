@@ -34,21 +34,16 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * History API
 * Attachments API
 * Drafts API
-* Test suites for OAuth and Labels APIs
-* Test suite for Messages API
-* Test suite for Threads API
-* Test suite for History API
-* Test suite for Drafts API
+* Test suites for OAuth, Labels, Messages, Threads, History, Drafts, Attachments
 
 ####TO DOs:
-* Test suite for Attachments API
 * Scala Docs
 * Performance comparison between synchronous Java vs. async Scala full mailbox sync
 * Sample router and supervisor (including implementation of RetryPolicy)
 
 ####Future[TO DOs]:
 * Support Google's Discovery API using Scala reflection
-* Implementation using Akka-Http instead of Spray
+* Implementation using Akka-Http
 * Define ListAll actor message for Gmail Messages, Threads and History
   - Actor sends all resources asynchronously in chunks of specified size
     rather than returning nextPageToken with each response and requiring the 
