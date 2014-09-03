@@ -87,10 +87,9 @@ object PersonSerializer extends Json4sJacksonSupport {
   FieldSerializer[Person]() }
 ```
 
-Next, define REST service end-points as implementations of
+Next, define REST service methods as implementations of
 `gmailapi.restclient.RestRequest` trait specifying concrete values for
-abstract members ```uri```, ```method```, ```credentials```, ```entity``` and
-```unmarshaller```:
+abstract members `uri`, `method`, `credentials`, `entity`, and `unmarshaller`:
 
 ```scala
 object People {
@@ -113,7 +112,8 @@ object People {
     val credentials = Some(token)
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Person](_: String))
-  ...
+
+  // other REST methods defined...
 }
 ```
 
@@ -140,7 +140,8 @@ class PeopleApiActor extends Actor with RestActor {
 }
 ```
 
-Access the service as follows:
+Access the APIs as follows:
+
 ```
 val myApi = system.actorOf(Props(new PeopleApiActor))
 implicit val creds = OAuth2BearerToken("...")
