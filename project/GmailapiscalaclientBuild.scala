@@ -8,7 +8,7 @@ object GmailapiscalaclientBuild extends Build {
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
       name := "gmail-api-scala-client",
-      organization := "gmailapi",
+      organization := "com.github.nemanja-stanarevic",
       version := "0.1.0-SNAPSHOT",
       scalaVersion := "2.11.2",
 

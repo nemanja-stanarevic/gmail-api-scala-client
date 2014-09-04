@@ -40,13 +40,13 @@ Pull requests, code reviews, comments and questions are all appreciated.
 * Akka-Http
 * Hide away nextPageToken from List methods for Threads, Messages and History
 
-Gmail API limits per user usage to 25 work units per second (moving average). For
-more details, see <https://developers.google.com/gmail/api/v1/reference/quota>
-Supervisors should implement exponential backoff when they receive TooManyRequests
-from the actor. The library provides scaffolding for retry policy implementation 
-(see gmailapi.restclient.RetryPolicy).
-
 ## Usage
+Gmail API limits per user usage to 25 work units per second (moving average). For
+more details, see <https://developers.google.com/gmail/api/v1/reference/quota>.
+
+Actor supervisors should implement exponential backoff when they receive 
+`TooManyRequests` message from the API actor. The library provides scaffolding 
+for retry policy implementation (see `gmailapi.restclient.RetryPolicy`).
 
 ```scala
 import akka.actor._
@@ -100,7 +100,6 @@ object People {
 
   case class Create(person: Person)(implicit val token: HttpCredentials)
     extends RestRequest {
-
     val uri = s"https://api.myservice.com/people"
     val method = HttpMethods.POST
     val credentials = Some(token)
@@ -109,7 +108,6 @@ object People {
 
   case class Get(userId: String)(implicit val token: HttpCredentials)
     extends RestRequest {
-
     val uri = s"https://api.myservice.com/people/$userId"
     val method = HttpMethods.GET
     val credentials = Some(token)
@@ -159,10 +157,11 @@ myApi ! People.Create(person)
 
 ## Dependencies
 
-* Akka (https://typesafe.com/platform/runtime/akka)
-* Spray (http://spray.io)
-* json4s (http://json4s.org)
-* scalatest
+* Scala 2.11 <https://typesafe.com/platform/tools/scala>
+* Akka 2.3.4 <https://typesafe.com/platform/runtime/akka>
+* Spray <http://spray.io>
+* json4s <http://json4s.org>
+* scalatest <http://http://www.scalatest.org>
 
 ## Installation
 
@@ -171,8 +170,9 @@ You can add the gmail-api-scala-client as a dependency as follows:
 ### SBT
 
 ```scala
-    // add Sonatype Snapshots to your resolvers
-    resolvers += "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+    // add Typesafe & Sonatype Snapshot resolvers
+    resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases",
+    resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
     // add library dependencies
     libraryDependencies ++= {
@@ -180,7 +180,7 @@ You can add the gmail-api-scala-client as a dependency as follows:
         val gmailApiScalaClientVersion = "0.1.0-SNAPSHOT"
         Seq(
           "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-          "com.github.nemanja-stanarevic" % "gmail-api-scala-client" % gmailApiScalaClientVersion)
+          "com.github.nemanja-stanarevic" %% "gmail-api-scala-client" % gmailApiScalaClientVersion)
       }
 ```
 
