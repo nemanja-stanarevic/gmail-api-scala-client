@@ -65,7 +65,14 @@ class GmailApiActor extends Actor with RestActor {
       RestResponses.InvalidRequest("Invalid label")) {
         _.contains("Invalid label")
       },
+    // Spec indicates that Gmail API shoots back 429 when the usage limit is 
+    // exceeded, but sometimes, it also returns 403 with "userRateLimitExceeded"
     RestActor.ErrorHandler(
       StatusCodes.TooManyRequests,
-      RestResponses.RateLimitExceeded)() )
+      RestResponses.RateLimitExceeded)(),
+    RestActor.ErrorHandler(
+      StatusCodes.Forbidden,
+      RestResponses.RateLimitExceeded) {
+        _.contains("userRateLimitExceeded")
+      })
 }
