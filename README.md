@@ -70,25 +70,25 @@ implicit val oauthConfig = ConfigFactory.parseString(s"""
     | oauth2.scope = "$scope" """.stripMargin)
 ```
 
-* If the user is accessing the app for the first time (i.e. you don't have a 
-refresh token, run `gmailapi.oauth2.authorizationUri` function to get the
+* If the user is accessing the app for the first time (i.e. there is no
+refresh token), run `gmailapi.oauth2.authorizationUri` function to get the
 authorization Uri
 
-* Create an actor and a router as appropriate, for example
+* Create an actor and router as appropriate, for example
 ```scala
 val props = Props(new GmailApiActorBackoff(maxRetries = 5))
-val gmailApi = context.actorOf(props.withRouter(
-  RoundRobinRouter(nrOfInstances = 10)))
+val gmailApi = context.actorOf(props.withRouter(RoundRobinRouter(
+  nrOfInstances = 10)))
 ```
 
-* Exchange an authorization code received through `redirectUri` for an OAuth2
-identity.  Store the result in an implicit var of OAuth2Identity type since api
-methods take as implicit OAuth2Identity parameter.
+* Exchange the authorization code received through `redirectUri` for an OAuth2
+identity.  Store the result in an implicit var of `OAuth2Identity` type since 
+api methods take an implicit `OAuth2Identity` parameter.
 ```scala
   gmailApi ! OAuth2.RequestToken(authCode)
 ```
 
-* Invoke any Gmail API method
+* Invoke Gmail API methods
 ```scala
 val label = Label(
   name = "My new label",
@@ -96,7 +96,7 @@ val label = Label(
   labelListVisibility = LabelListVisibility.LabelShowIfUnread)
 gmailApi ! Labels.Create(label)
 
-gmailApi ! Threads.List(labelIds = Seq("My new label"))
+gmailApi ! Threads.List(labelIds = Seq("INBOX", "SENT"))
 
 val rawMsg = MessageFactory.createMessage(
   fromAddress = Some(("Alice", "alice@gmail.com")),
