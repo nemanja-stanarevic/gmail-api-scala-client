@@ -53,7 +53,7 @@ import gmailapi.oauth2._
 import gmailapi.methods._
 import gmailapi.resources._
 import gmailapi.restclient.RestResponses
-'''
+```
 
 * OAuth2 methods take Typesafe Config as implicit parameter.  The config should
 define `clientId`, `clientSecret`, `redirectUrl` and `scope`.  See 
