@@ -197,8 +197,8 @@ implicit val creds = OAuth2BearerToken("...")
 
 val person = Person(
   givenName = "John",
-  familyName = "Appleseed",
-  email = Some("john.appleseed@icloud.com"))
+  familyName = "Doe",
+  email = Some("john.doe@gmail.com"))
 
 myApi ! People.Create(person)
 ```
