@@ -1,8 +1,7 @@
 # gmail-api-scala-client [![Build Status](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client.svg?branch=master)](https://travis-ci.org/nemanja-stanarevic/gmail-api-scala-client)
 
 ## Motivation
-This project aims to provide an asynchronous, actor-based, pure Scala library
-for Gmail API.
+Provide an asynchronous, actor-based, pure Scala library for Gmail API.
 
 Google published Gmail API client libraries for Java, .NET and Python, with Go
 and Dart libraries in the works. However, there is currently no native Scala
@@ -14,16 +13,15 @@ since the library is synchronous.
 * Actor-based
 * Fast and lightweight
 * Data model based on case classes and Scala collections
-* Easily extensible to support additional Google and non-Google APIs
+* Easily extensible to support additional Google and other third-party APIs
 * Configuration via Typesafe Config
 * Logging via Akka event bus
 * Type safety
 
 ## Project Status
 
-Project is under development. Code documentation is under way.
-
-Pull requests, code reviews, comments and questions are all appreciated.
+* Project is under development. Code documentation is under way.
+* Pull requests, code reviews, comments and questions are all appreciated.
 
 ####Completed:
 * OAuth, Labels, Messages, Threads, History, Attachments and Drafts APIs
@@ -43,8 +41,8 @@ Pull requests, code reviews, comments and questions are all appreciated.
 Gmail API limits per user usage to 25 work units per second (moving average). For
 more details, see <https://developers.google.com/gmail/api/v1/reference/quota>.
 
-Clients should use `gmailapi.GmailApiActorBackoff` which incorporates exponential 
-backoff when there are too many requests for a specific user.
+Clients should use `gmailapi.GmailApiActorBackoff`, which incorporates exponential
+backoff, when there are too many requests for a specific user.
 
 * Imports
 ```scala
