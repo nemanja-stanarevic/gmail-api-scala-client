@@ -59,12 +59,12 @@ object Messages {
 
   case class Insert(message: Message, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
-    assert(message.id == None)
-    assert(message.snippet == None)
-    assert(message.historyId == None)
-    assert(message.payload == None)
-    assert(message.sizeEstimate == None)
-    assert(message.raw != None)
+    require(message.id == None)
+    require(message.snippet == None)
+    require(message.historyId == None)
+    require(message.payload == None)
+    require(message.sizeEstimate == None)
+    require(message.raw != None)
 
     val uri = s"$baseUri/users/$userId/messages"
     val method = HttpMethods.POST
@@ -129,13 +129,13 @@ object Messages {
 
   case class Send(message: Message, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
-    assert(message.id == None)
-    assert(message.labelIds == Nil)
-    assert(message.snippet == None)
-    assert(message.historyId == None)
-    assert(message.payload == None)
-    assert(message.sizeEstimate == None)
-    assert(message.raw != None)
+    require(message.id == None)
+    require(message.labelIds == Nil)
+    require(message.snippet == None)
+    require(message.historyId == None)
+    require(message.payload == None)
+    require(message.sizeEstimate == None)
+    require(message.raw != None)
 
     val uri = s"$baseUri/users/$userId/messages/send"
     val method = HttpMethods.POST
@@ -171,13 +171,13 @@ object Messages {
 
   case class Import(message: Message, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
-    assert(message.id == None)
-    assert(message.labelIds == Nil)
-    assert(message.snippet == None)
-    assert(message.historyId == None)
-    assert(message.payload == None)
-    assert(message.sizeEstimate == None)
-    assert(message.raw != None)
+    require(message.id == None)
+    require(message.labelIds == Nil)
+    require(message.snippet == None)
+    require(message.historyId == None)
+    require(message.payload == None)
+    require(message.sizeEstimate == None)
+    require(message.raw != None)
 
     val uri = s"$baseUri/users/$userId/messages/import"
     val method = HttpMethods.POST

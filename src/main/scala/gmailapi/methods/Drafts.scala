@@ -32,14 +32,14 @@ object Drafts {
   case class Create(draft: Draft, userId: String = "me")
     (implicit val token: OAuth2Identity)
     extends GmailRestRequest {
-    assert(draft.message != None)
-    assert(draft.message.get.id == None)
-    assert(draft.message.get.labelIds == Nil)
-    assert(draft.message.get.snippet == None)
-    assert(draft.message.get.historyId == None)
-    assert(draft.message.get.payload == None)
-    assert(draft.message.get.sizeEstimate == None)
-    assert(draft.message.get.raw != None)
+    require(draft.message != None)
+    require(draft.message.get.id == None)
+    require(draft.message.get.labelIds == Nil)
+    require(draft.message.get.snippet == None)
+    require(draft.message.get.historyId == None)
+    require(draft.message.get.payload == None)
+    require(draft.message.get.sizeEstimate == None)
+    require(draft.message.get.raw != None)
 
     val uri = s"$baseUri/users/$userId/drafts"
     val method = HttpMethods.POST
@@ -89,14 +89,14 @@ object Drafts {
 
   case class Update(id: String, draft: Draft, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
-    assert(draft.message != None)
-    assert(draft.message.get.id == None)
-    assert(draft.message.get.labelIds == Nil)
-    assert(draft.message.get.snippet == None)
-    assert(draft.message.get.historyId == None)
-    assert(draft.message.get.payload == None)
-    assert(draft.message.get.sizeEstimate == None)
-    assert(draft.message.get.raw != None)
+    require(draft.message != None)
+    require(draft.message.get.id == None)
+    require(draft.message.get.labelIds == Nil)
+    require(draft.message.get.snippet == None)
+    require(draft.message.get.historyId == None)
+    require(draft.message.get.payload == None)
+    require(draft.message.get.sizeEstimate == None)
+    require(draft.message.get.raw != None)
 
     val uri = s"$baseUri/users/$userId/drafts/$id"
     val method = HttpMethods.PUT
@@ -122,8 +122,8 @@ object Drafts {
 
   case class Send(draft: Draft, userId: String = "me")
     (implicit val token: OAuth2Identity) extends GmailRestRequest {
-    assert(draft.message == None)
-    assert(draft.id != None)
+    require(draft.message == None)
+    require(draft.id != None)
 
     val uri = s"$baseUri/users/$userId/drafts/send"
     val method = HttpMethods.POST
