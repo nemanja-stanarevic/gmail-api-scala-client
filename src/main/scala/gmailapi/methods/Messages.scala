@@ -25,6 +25,7 @@ import gmailapi.resources.{ MessageHeader, MessagePart, MessageList }
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
+import scala.language.postfixOps
 import spray.http.{HttpCredentials, HttpEntity, HttpMethods, ContentTypes, Uri}
 
 object Messages {
@@ -38,6 +39,7 @@ object Messages {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = None
+    val quotaUnits = 10
   }
 
   case class Get(
@@ -52,6 +54,7 @@ object Messages {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 5
   }
 
   case class Insert(message: Message, userId: String = "me")
@@ -70,6 +73,7 @@ object Messages {
       ContentTypes.`application/json`,
       write(message))
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 10
   }
 
   case class List(
@@ -103,6 +107,7 @@ object Messages {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[MessageList](_: String))
+    val quotaUnits = 10
   }
 
   case class Modify(
@@ -119,6 +124,7 @@ object Messages {
       "addLabelIds" -> addLabelIds,
       "removeLabelIds" -> removeLabelIds)))
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 5
   }
 
   case class Send(message: Message, userId: String = "me")
@@ -138,6 +144,7 @@ object Messages {
       ContentTypes.`application/json`,
       write(message))
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 25
   }
 
   case class Trash(id: String, userId: String = "me")
@@ -148,6 +155,7 @@ object Messages {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 5
   }
 
   case class Untrash(id: String, userId: String = "me")
@@ -158,6 +166,7 @@ object Messages {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 5
   }
 
   case class Import(message: Message, userId: String = "me")
@@ -177,6 +186,7 @@ object Messages {
       ContentTypes.`application/json`,
       write(message))
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 25
   }
 
   object Attachments {
@@ -188,6 +198,7 @@ object Messages {
       val credentials: Option[HttpCredentials] = token
       val entity = HttpEntity.Empty
       val unmarshaller = Some(read[MessageAttachment](_: String))
+      val quotaUnits = 5
     }
   }
 }

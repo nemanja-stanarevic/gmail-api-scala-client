@@ -23,6 +23,7 @@ import gmailapi.resources.{ Thread, ThreadList, GmailSerializer }
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
+import scala.language.postfixOps
 import spray.http.{HttpCredentials, HttpEntity, HttpMethods, ContentTypes, Uri}
 
 object Threads {
@@ -36,6 +37,7 @@ object Threads {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Thread](_: String))
+    val quotaUnits = 10
   }
 
   case class List(
@@ -69,6 +71,7 @@ object Threads {
     val credentials : Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[ThreadList](_:String))
+    val quotaUnits = 10
   }
 
   case class Modify(
@@ -85,6 +88,7 @@ object Threads {
       "addLabelIds" -> addLabelIds,
       "removeLabelIds" -> removeLabelIds)))
     val unmarshaller = Some(read[Thread](_: String))
+    val quotaUnits = 10
   }
 
   case class Delete(id: String, userId: String = "me")
@@ -95,6 +99,7 @@ object Threads {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = None
+    val quotaUnits = 20
   }
 
   case class Trash(id: String, userId: String = "me")
@@ -105,6 +110,7 @@ object Threads {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Thread](_: String))
+    val quotaUnits = 10
   }
 
   case class Untrash(id: String, userId: String = "me")
@@ -115,5 +121,6 @@ object Threads {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Thread](_: String))
+    val quotaUnits = 10
   }
 }

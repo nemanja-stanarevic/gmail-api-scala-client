@@ -46,7 +46,6 @@ import gmailapi.restclient.RestResponses
 class GmailMessagesSuite(_system: ActorSystem)
   extends TestKit(_system)
   with FunSuiteLike
-  with ShouldMatchers
   with BeforeAndAfterAll
   with ImplicitSender {
   def this() = this(ActorSystem("TestSystem", ConfigFactory.parseString("""
@@ -277,71 +276,9 @@ class GmailMessagesSuite(_system: ActorSystem)
     java.lang.Thread.sleep(250)
   }
 
-  var secondMessage = Message()
-  var secondMessageId = ""
-  var secondSubject = ""
-  var secondTo = ""
-  test("11-Gmail.Messages.Import") {
-    val probe = TestProbe()
-    val id = scala.util.Random.nextLong
-    secondSubject = "Scala API Test " + id
-    secondTo = s"scala.api.test+$id@gmail.com"
-    val rawMsg = MessageFactory.createMessage(
-      fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
-      to = Seq(("Scala API Test", secondTo)),
-      subject = Some(secondSubject),
-      textMsg = Some(secondSubject),
-      htmlMsg = Some(s"<html><body><i>$secondSubject</i></body></html>"))
-    probe.send(gmailApi, Messages.Import(message = rawMsg))
-    /* not sure why we need 60 s timeout here when the roundtrip takes ~0.5 s*/
-    val result = probe.expectMsgType[Resource[Message]](60 seconds)
-    secondMessage = result.get
-    secondMessageId = secondMessage.id.get
-
-    // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(1000)
-  }
-
-  test("12-Gmail.Messages.Get--ImportedMessage") {
-    val probe = TestProbe()
-    assert(secondMessageId != "")
-    probe.send(gmailApi, Messages.Get(id = secondMessageId))
-    val result = probe.expectMsgType[Resource[Message]]
-    val returnMessage = result.get
-
-    if (secondMessageId != returnMessage.id.get)
-      fail("Gmail.Messages.Get should return the requested message.")
-
-    if (returnMessage.id == None)
-      fail("Gmail.Messages.Get should include historyId.")
-
-    if (returnMessage.threadId == "")
-      fail("Gmail.Messages.Get should include threadId.")
-
-    if (returnMessage.labelIds.length == 0)
-      fail("Gmail.Messages.Get should include some labelIds.")
-
-    if (returnMessage.snippet == None)
-      fail("Gmail.Messages.Get should include snippet.")
-
-    if (returnMessage.historyId == None)
-      fail("Gmail.Messages.Get should include historyId.")
-
-    if (returnMessage.payload == None)
-      fail("Gmail.Messages.Get should include payload.")
-
-    if (returnMessage.sizeEstimate == None)
-      fail("Gmail.Messages.Get should include sizeEstimate.")
-
-    if (returnMessage.raw != None)
-      fail("Gmail.Messages.Get should not include raw (this was full request).")
-
-    // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(250)
-  }
 
   var thirdMessageId = ""
-  test("13-Gmail.Messages.Send") {
+  test("11-Gmail.Messages.Send") {
     val probe = TestProbe()
     val id = scala.util.Random.nextLong
     val thirdSubject = "Scala API Test " + id
@@ -365,7 +302,7 @@ class GmailMessagesSuite(_system: ActorSystem)
   }
 
   var fourthMessageId = ""
-  test("13-Gmail.Messages.Attachments - Insert and Get") {
+  test("12-Gmail.Messages.Attachments - Insert and Get") {
     val probe = TestProbe()
     val id = scala.util.Random.nextLong
     val fourthSubject = "Scala API Test " + id
@@ -411,16 +348,10 @@ class GmailMessagesSuite(_system: ActorSystem)
     }
  }
 
- test("14-Gmail.Messages.Delete") {
+ test("13-Gmail.Messages.Delete") {
     val probe = TestProbe()
     assert(actualMessageId != "")
     probe.send(gmailApi, Messages.Delete(id = actualMessageId))
-    probe.expectMsg(Done)
-    // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(500)
-
-    assert(secondMessageId != "")
-    probe.send(gmailApi, Messages.Delete(id = secondMessageId))
     probe.expectMsg(Done)
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(500)
@@ -443,9 +374,6 @@ class GmailMessagesSuite(_system: ActorSystem)
 
     if (!(returnMessageList.messages filter (_.id == actualMessageId) isEmpty))
       fail(s"Gmail.Messages.Delete should remove $actualMessageId.")
-
-    if (!(returnMessageList.messages filter (_.id == secondMessageId) isEmpty))
-      fail(s"Gmail.Messages.Delete should remove $secondMessageId.")
 
     if (!(returnMessageList.messages filter (_.id == thirdMessageId) isEmpty))
       fail(s"Gmail.Messages.Delete should remove $thirdMessageId.")

@@ -43,7 +43,7 @@ import gmailapi.methods._
 import gmailapi.resources._
 import gmailapi.restclient.RestResponses
 
-class GmailHistorySuite(_system: ActorSystem)
+class GmailMessagesImportSuite(_system: ActorSystem)
   extends TestKit(_system)
   with FunSuiteLike
   with BeforeAndAfterAll
@@ -93,118 +93,91 @@ class GmailHistorySuite(_system: ActorSystem)
     oauthId = result.get
   }
 
-  var actualMessageId = ""
-  var startingHistoryId = ""
-
-  test("02-Gmail.Messages.Insert -- Start of history observation") {
+  var secondMessage = Message()
+  var secondMessageId = ""
+  var secondSubject = ""
+  var secondTo = ""
+  test("02-Gmail.Messages.Import") {
     val probe = TestProbe()
     val id = scala.util.Random.nextLong
-    val actualSubject = "Scala API Test " + id
-    val actualTo = s"scala.api.test+$id@gmail.com"
+    secondSubject = "Scala API Test " + id
+    secondTo = s"scala.api.test+$id@gmail.com"
     val rawMsg = MessageFactory.createMessage(
-      labelIds = Seq("INBOX"),
       fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
-      to = Seq(("Scala API Test", actualTo)),
-      subject = Some(actualSubject),
-      textMsg = Some(actualSubject),
-      htmlMsg = Some(s"<html><body><i>$actualSubject</i></body></html>"))
-    probe.send(gmailApi, Messages.Insert(message = rawMsg))
-    val result = probe.expectMsgType[Resource[Message]]
-    val actualMessage = result.get
-    actualMessageId = actualMessage.id.get
+      to = Seq(("Scala API Test", secondTo)),
+      subject = Some(secondSubject),
+      textMsg = Some(secondSubject),
+      htmlMsg = Some(s"<html><body><i>$secondSubject</i></body></html>"))
+    probe.send(gmailApi, Messages.Import(message = rawMsg))
+    /* not sure why we need 60 s timeout here when the roundtrip takes ~0.5 s*/
+    val result = probe.expectMsgType[Resource[Message]](60 seconds)
+    secondMessage = result.get
+    secondMessageId = secondMessage.id.get
 
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(1000)
+  }
 
-    // However, we need to "get" a message to see historyId - 
-    probe.send(gmailApi, Messages.Get(id = actualMessageId))
-    val fullResult = probe.expectMsgType[Resource[Message]]
-    val fullMessage = fullResult.get
-    startingHistoryId = fullMessage.historyId.get
+  test("03-Gmail.Messages.Get--ImportedMessage") {
+    val probe = TestProbe()
+    assert(secondMessageId != "")
+    probe.send(gmailApi, Messages.Get(id = secondMessageId))
+    val result = probe.expectMsgType[Resource[Message]]
+    val returnMessage = result.get
+
+    if (secondMessageId != returnMessage.id.get)
+      fail("Gmail.Messages.Get should return the requested message.")
+
+    if (returnMessage.id == None)
+      fail("Gmail.Messages.Get should include historyId.")
+
+    if (returnMessage.threadId == "")
+      fail("Gmail.Messages.Get should include threadId.")
+
+    if (returnMessage.labelIds.length == 0)
+      fail("Gmail.Messages.Get should include some labelIds.")
+
+    if (returnMessage.snippet == None)
+      fail("Gmail.Messages.Get should include snippet.")
+
+    if (returnMessage.historyId == None)
+      fail("Gmail.Messages.Get should include historyId.")
+
+    if (returnMessage.payload == None)
+      fail("Gmail.Messages.Get should include payload.")
+
+    if (returnMessage.sizeEstimate == None)
+      fail("Gmail.Messages.Get should include sizeEstimate.")
+
+    if (returnMessage.raw != None)
+      fail("Gmail.Messages.Get should not include raw (this was full request).")
 
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(250)
   }
 
-  test("03-Gmail.Histories.List") {
+  test("04-Gmail.Messages.Delete") {
     val probe = TestProbe()
-    probe.send(gmailApi, Histories.List(
-      startHistoryId = startingHistoryId,
-      labelIds = Seq("INBOX"),
-      maxResults = Some(1000)))
-    val result = probe.expectMsgType[Resource[HistoryList]]
-    val returnHistoryList = result.get
 
-    // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(250)
-  }
-
-  var additionalMessageIds = List[String]()
-  test("04-Gmail.Messages.Insert -- insert 5 new messages") {
-    val probe = TestProbe()
-    var count = 5
-    while (count > 0) {
-      val id = scala.util.Random.nextLong
-      val actualSubject = "Scala API Test " + id
-      val actualTo = s"scala.api.test+$id@gmail.com"
-      val rawMsg = MessageFactory.createMessage(
-        labelIds = Seq("INBOX"),
-        fromAddress = Some(("Scala API Test", "scala.api.test@gmail.com")),
-        to = Seq(("Scala API Test", actualTo)),
-        subject = Some(actualSubject),
-        textMsg = Some(actualSubject),
-        htmlMsg = Some(s"<html><body><i>$actualSubject</i></body></html>"))
-      probe.send(gmailApi, Messages.Insert(message = rawMsg))
-      val result = probe.expectMsgType[Resource[Message]]
-      val actualMessage = result.get
-      additionalMessageIds = actualMessage.id.get :: additionalMessageIds
-      // this is to throttle the request rate on Google API
-      java.lang.Thread.sleep(1000)
-      count = count - 1
-    }
-  }
-
-  test("05-Gmail.Histories.List -- confirm new messages are in the history") {
-    val probe = TestProbe()
-    probe.send(gmailApi, Histories.List(
-      startHistoryId = startingHistoryId,
-      labelIds = Seq("INBOX"),
-      maxResults = Some(1000)))
-    val result = probe.expectMsgType[Resource[HistoryList]]
-    val returnHistoryList = result.get
-
-    // confirm that startingHistoryId is no longer the current history id
-    if (returnHistoryList.historyId == startingHistoryId)
-      fail(s"Gmail.Histories.List should not return a stale history Id")
-
-    if (returnHistoryList.history == Nil)
-      fail(s"Gmail.Histories.List should return a non-empty history list.")
-
-    val messages = returnHistoryList.history flatMap (_.messages)
-    additionalMessageIds foreach { messageId =>
-      if (messages.find(_.id.get == messageId) == None)
-        fail(s"Gmail.Histories.List should include messageId: $messageId.")
-    }
-
-    // this is to throttle the request rate on Google API
-    java.lang.Thread.sleep(250)
-  }
-
-  test("06-Gmail.Messages.Delete -- Cleanup") {
-    val probe = TestProbe()
-    assert(actualMessageId != "")
-    probe.send(gmailApi, Messages.Delete(id = actualMessageId))
+    assert(secondMessageId != "")
+    probe.send(gmailApi, Messages.Delete(id = secondMessageId))
     probe.expectMsg(Done)
-
     // this is to throttle the request rate on Google API
     java.lang.Thread.sleep(500)
 
-    additionalMessageIds foreach { messageId =>
-      probe.send(gmailApi, Messages.Delete(id = messageId))
-      probe.expectMsg(Done)
-      // this is to throttle the request rate on Google API
-      java.lang.Thread.sleep(500)
-    }
+
+    probe.send(gmailApi, Messages.List())
+    val result = probe.expectMsgType[Resource[MessageList]]
+    val returnMessageList = result.get
+
+    if (!(returnMessageList.messages filter (_.id == secondMessageId) isEmpty))
+      fail(s"Gmail.Messages.Delete should remove $secondMessageId.")
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(250)
+
+    // this is to throttle the request rate on Google API
+    java.lang.Thread.sleep(500)
   }
 }
 

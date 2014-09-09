@@ -23,6 +23,7 @@ import gmailapi.resources.{ Label, GmailSerializer }
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
+import scala.language.postfixOps
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes }
 
 object Labels {
@@ -36,6 +37,7 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity: HttpEntity = HttpEntity(ContentTypes.`application/json`, write(label))
     val unmarshaller = Some(read[Label](_: String))
+    val quotaUnits = 5
   }
 
   case class Delete(id: String, userId: String = "me")
@@ -46,6 +48,7 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = None
+    val quotaUnits = 5
   }
 
   case class List(userId: String = "me")
@@ -56,6 +59,7 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some((str: String) => (parse(str) \\ "labels").extract[Seq[Label]])
+    val quotaUnits = 1
   }
 
   case class Update(id: String, label: Label, userId: String = "me")
@@ -66,6 +70,7 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity(ContentTypes.`application/json`, write(label))
     val unmarshaller = Some(read[Label](_: String))
+    val quotaUnits = 5
   }
 
   case class Get(id: String, userId: String = "me")
@@ -76,6 +81,7 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Label](_: String))
+    val quotaUnits = 1
   }
 
   case class Patch(id: String, patch: Map[String, Any], userId: String = "me")
@@ -87,5 +93,6 @@ object Labels {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity(ContentTypes.`application/json`, write(patch))
     val unmarshaller = Some(read[Label](_: String))
+    val quotaUnits = 5 /* undefined by API docs, but assuming 5 */
   }
 }

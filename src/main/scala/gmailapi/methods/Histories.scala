@@ -23,6 +23,7 @@ import gmailapi.resources.{ History, HistoryList, GmailSerializer }
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
+import scala.language.postfixOps
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes, Uri }
 
 object Histories {
@@ -55,5 +56,6 @@ object Histories {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[HistoryList](_: String))
+    val quotaUnits = 2
   }
 }

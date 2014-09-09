@@ -28,35 +28,83 @@ Pull requests, code reviews, comments and questions are all appreciated.
 ####Completed:
 * OAuth, Labels, Messages, Threads, History, Attachments and Drafts APIs
 * Test suites for all APIs
+* Exponential back off wrapper for Gmail API actor, see `gmailapi.GmailApiActorBackoff`
 
 ####TO DOs:
 * Scala Docs
-* Router and supervisor (including implementation of RetryPolicy)
-* Performance comparison between synchronous Java vs. async Scala clients
 
 ####Future[TO DOs]:
 * Full inbox sync example code
-* Google Discovery API + Scala reflection to create methods and resources on the fly
-* Akka-Http
+* Refactor with Google Discovery API and Scala reflection
+* Refactor with Akka-Http
 * Hide away nextPageToken from List methods for Threads, Messages and History
 
 ## Usage
 Gmail API limits per user usage to 25 work units per second (moving average). For
 more details, see <https://developers.google.com/gmail/api/v1/reference/quota>.
 
-Actor supervisors should implement exponential backoff when they receive 
-`TooManyRequests` message from the API actor. The library provides scaffolding 
-for retry policy implementation (see `gmailapi.restclient.RetryPolicy`).
+Clients should use `gmailapi.GmailApiActorBackoff` which incorporates exponential 
+backoff when there are too many requests for a specific user.
 
+* Imports
 ```scala
-import akka.actor._
+import gmailapi.GmailApiActorBackoff
 import gmailapi.oauth2._
 import gmailapi.methods._
 import gmailapi.resources._
 import gmailapi.restclient.RestResponses
+'''
 
-// TO DO
-...
+* OAuth2 methods take Typesafe Config as implicit parameter.  The config should
+define `clientId`, `clientSecret`, `redirectUrl` and `scope`.  See 
+<https://developers.google.com/gmail/api/auth/web-server> for more details.
+```scala
+val scope = Seq(
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/userinfo.profile",
+  "https://mail.google.com/") mkString " "
+implicit val oauthConfig = ConfigFactory.parseString(s"""
+    | oauth2.clientId = "...",
+    | oauth2.clientSecret = "...",
+    | oauth2.redirectUri = "...",
+    | oauth2.scope = "$scope" """.stripMargin)
+```
+
+* If the user is accessing the app for the first time (i.e. you don't have a 
+refresh token, run `gmailapi.oauth2.authorizationUri` function to get the
+authorization Uri
+
+* Create an actor and a router as appropriate, for example
+```scala
+val props = Props(new GmailApiActorBackoff(maxRetries = 5))
+val gmailApi = context.actorOf(props.withRouter(
+  RoundRobinRouter(nrOfInstances = 10)))
+```
+
+* Exchange an authorization code received through `redirectUri` for an OAuth2
+identity.  Store the result in an implicit var of OAuth2Identity type since api
+methods take as implicit OAuth2Identity parameter.
+```scala
+  gmailApi ! OAuth2.RequestToken(authCode)
+```
+
+* Invoke any Gmail API method
+```scala
+val label = Label(
+  name = "My new label",
+  messageListVisibility = MessageListVisibility.Hide,
+  labelListVisibility = LabelListVisibility.LabelShowIfUnread)
+gmailApi ! Labels.Create(label)
+
+gmailApi ! Threads.List(labelIds = Seq("My new label"))
+
+val rawMsg = MessageFactory.createMessage(
+  fromAddress = Some(("Alice", "alice@gmail.com")),
+  to = Seq(("Bob", "bob@gmail.com")),
+  subject = Some("Hello"),
+  textMsg = Some("World"),
+  htmlMsg = Some(s"<html><body><i>World</i></body></html>"))
+gmailApi ! Messages.Send(message = rawMsg)
 ```
 
 ## How to extend the API coverage
@@ -170,18 +218,14 @@ You can add the gmail-api-scala-client as a dependency as follows:
 ### SBT
 
 ```scala
-    // add Typesafe & Sonatype Snapshot resolvers
-    resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases",
-    resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  // add Typesafe & Sonatype Snapshot resolvers
+  resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
-    // add library dependencies
-    libraryDependencies ++= {
-        val akkaVersion = "2.3.4"
-        val gmailApiScalaClientVersion = "0.1.0-SNAPSHOT"
-        Seq(
-          "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-          "com.github.nemanja-stanarevic" %% "gmail-api-scala-client" % gmailApiScalaClientVersion)
-      }
+  // add library dependency
+  libraryDependencies ++= {
+    val gmailApiScalaClientVersion = "0.1.0-SNAPSHOT"
+    Seq("com.github.nemanja-stanarevic" %% "gmail-api-scala-client" % gmailApiScalaClientVersion)
+  }
 ```
 
 Made with ❤ in NYC at Hacker School <http://hackerschool.com>

@@ -19,7 +19,6 @@ package gmailapi
 
 import akka.actor.Actor
 import akka.event.Logging
-import org.json4s.jackson.Serialization.{ read, write }
 import spray.http.{ ContentTypes, StatusCodes }
 import spray.httpx.unmarshalling._
 import spray.client.pipelining._
@@ -69,7 +68,7 @@ class GmailApiActor extends Actor with RestActor {
     // exceeded, but sometimes, it also returns 403 with "userRateLimitExceeded"
     RestActor.ErrorHandler(
       StatusCodes.TooManyRequests,
-      RestResponses.RateLimitExceeded)(),
+      RestResponses.TooManyRequests)(),
     RestActor.ErrorHandler(
       StatusCodes.Forbidden,
       RestResponses.RateLimitExceeded) {

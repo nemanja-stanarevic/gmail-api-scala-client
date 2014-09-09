@@ -46,7 +46,6 @@ import gmailapi.restclient.RestResponses
 class GmailDraftsSuite(_system: ActorSystem)
   extends TestKit(_system)
   with FunSuiteLike
-  with ShouldMatchers
   with BeforeAndAfterAll
   with ImplicitSender {
   def this() = this(ActorSystem("TestSystem", ConfigFactory.parseString("""

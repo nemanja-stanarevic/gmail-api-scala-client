@@ -18,6 +18,7 @@
 package gmailapi
 
 import com.typesafe.config.Config
+import scala.language.postfixOps
 import spray.http.Uri
 
 package object oauth2 {

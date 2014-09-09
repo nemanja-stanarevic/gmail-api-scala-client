@@ -24,6 +24,7 @@ import org.json4s.jackson.JsonMethods.parse
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes }
 import spray.http.{ FormData, Uri }
 import spray.httpx.marshalling.marshal
+import scala.language.postfixOps
 
 object OAuth2 {
 
@@ -52,6 +53,7 @@ object OAuth2 {
 
       OAuth2Identity(accessToken, refreshToken, now + expiresIn)
     })
+    val quotaUnits = 0
   }
 
   case class ValidateToken(token: OAuth2Identity)
@@ -85,6 +87,7 @@ object OAuth2 {
         token.gender,
         token.locale)
     })
+    val quotaUnits = 0
   }
 
   case class RefreshToken(token: OAuth2Identity)
@@ -123,6 +126,7 @@ object OAuth2 {
         token.gender,
         token.locale)
     })
+    val quotaUnits = 0
   }
 
   case class GetUserInfo(token: OAuth2Identity)(implicit val config: Config) extends GmailRestRequest {
@@ -149,6 +153,7 @@ object OAuth2 {
         Some((json \\ "gender").extract[String]),
         Some((json \\ "locale").extract[String]))
     })
+    val quotaUnits = 0
   }
 
 }

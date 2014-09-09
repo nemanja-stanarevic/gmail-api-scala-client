@@ -23,6 +23,7 @@ import gmailapi.resources.{ Draft, DraftList, Message, MessageFormat, GmailSeria
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.jackson.JsonMethods.parse
 import scala.collection.immutable.Map
+import scala.language.postfixOps
 import spray.http.{ HttpCredentials, HttpEntity, HttpMethods, ContentTypes, Uri }
 
 object Drafts {
@@ -47,6 +48,7 @@ object Drafts {
       ContentTypes.`application/json`,
       write(draft))
     val unmarshaller = Some(read[Draft](_: String))
+    val quotaUnits = 10
   }
 
   case class Delete(id: String, userId: String = "me")
@@ -58,6 +60,7 @@ object Drafts {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = None
+    val quotaUnits = 10
   }
 
   case class List(
@@ -81,6 +84,7 @@ object Drafts {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[DraftList](_: String))
+    val quotaUnits = 5
   }
 
   case class Update(id: String, draft: Draft, userId: String = "me")
@@ -99,6 +103,7 @@ object Drafts {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity(ContentTypes.`application/json`, write(draft))
     val unmarshaller = Some(read[Draft](_: String))
+    val quotaUnits = 15
   }
 
   case class Get(
@@ -112,6 +117,7 @@ object Drafts {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity.Empty
     val unmarshaller = Some(read[Draft](_: String))
+    val quotaUnits = 5
   }
 
   case class Send(draft: Draft, userId: String = "me")
@@ -124,5 +130,6 @@ object Drafts {
     val credentials: Option[HttpCredentials] = token
     val entity = HttpEntity(ContentTypes.`application/json`, write(draft))
     val unmarshaller = Some(read[Message](_: String))
+    val quotaUnits = 25
   }
 }

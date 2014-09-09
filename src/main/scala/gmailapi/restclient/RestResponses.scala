@@ -20,48 +20,23 @@ package gmailapi.restclient
 import spray.http.{ HttpMethod, HttpCredentials, HttpEntity }
 
 object RestResponses {
-  sealed trait RestResponse {
-    val isFailure: Boolean
-    val retryPolicy: Option[RetryPolicy]
-  }
+  sealed trait RestResponse
 
-  case class Resource[+A](get: A) extends RestResponse {
-    val isFailure = false
-    val retryPolicy = RetryPolicy.None
-  }
+  case class Resource[+A](get: A) extends RestResponse
 
-  case object NotFound extends RestResponse {
-    val isFailure = false
-    val retryPolicy = RetryPolicy.None
-  }
+  case object NotFound extends RestResponse
 
-  case object Done extends RestResponse {
-    val isFailure = false
-    val retryPolicy = RetryPolicy.None
-  }
+  case object Done extends RestResponse
 
-  case object ExpiredAuthToken extends RestResponse {
-    val isFailure = true
-    val retryPolicy = RetryPolicy.OnceImmediate
-  }
+  case object ExpiredAuthToken extends RestResponse
 
-  case object RateLimitExceeded extends RestResponse {
-    val isFailure = false
-    val retryPolicy: Option[RetryPolicy] = RetryPolicy.ExponentialBackoff
-  }
+  case object RateLimitExceeded extends RestResponse
 
-  case class InvalidRequest(message: String) extends RestResponse {
-    val isFailure = true
-    val retryPolicy = RetryPolicy.None
-  }
+  case object TooManyRequests extends RestResponse
 
-  case class Failure(statusCode: Int, message: String) extends RestResponse {
-    val isFailure = true
-    val retryPolicy: Option[RetryPolicy] = RetryPolicy.ExponentialBackoff
-  }
+  case class InvalidRequest(message: String) extends RestResponse
 
-  case class Exception(throwable: Throwable) extends RestResponse {
-    val isFailure = true
-    val retryPolicy = RetryPolicy.None
-  }
+  case class Failure(statusCode: Int, message: String) extends RestResponse
+
+  case class Exception(throwable: Throwable) extends RestResponse
 }
