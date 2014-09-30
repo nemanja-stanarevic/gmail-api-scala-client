@@ -48,8 +48,8 @@ object OAuth2 {
       implicit val format = org.json4s.DefaultFormats
       val accessToken = (json \\ "access_token").extract[String]
       val refreshToken = (json \\ "refresh_token").extract[String]
-      val expiresIn = (json \\ "expires_in").extract[Long]
-      val now = System.currentTimeMillis / 1000L
+      val expiresIn = (json \\ "expires_in").extract[Long] * 1000L
+      val now = System.currentTimeMillis
 
       OAuth2Identity(accessToken, refreshToken, now + expiresIn)
     })
@@ -71,8 +71,8 @@ object OAuth2 {
     val unmarshaller = Some((response: String) => {
       implicit val format = org.json4s.DefaultFormats
       val json = parse(response)
-      val expiresIn = (json \\ "expires_in").extract[Long]
-      val now = System.currentTimeMillis / 1000L
+      val expiresIn = (json \\ "expires_in").extract[Long] * 1000L
+      val now = System.currentTimeMillis
       OAuth2Identity(
         token.accessToken,
         token.refreshToken,
@@ -109,8 +109,8 @@ object OAuth2 {
       implicit val format = org.json4s.DefaultFormats
       val json = parse(response)
       val accessToken = (json \\ "access_token").extract[String]
-      val expiresIn = (json \\ "expires_in").extract[Long]
-      val now = System.currentTimeMillis / 1000L
+      val expiresIn = (json \\ "expires_in").extract[Long] * 1000L
+      val now = System.currentTimeMillis
 
       OAuth2Identity(
         accessToken,
